@@ -12,28 +12,28 @@ class ProductSocial extends Component {
                <ShareButton
                   compact
                   socialMedia={'facebook'}
-                  url={'https://www.giftingwild.com' + this.props.location.pathname}
+                  url={'https://floating-woodland-46616.herokuapp.com' + this.props.location.pathname}
                   media={this.props.variantImage}
                   text={this.props.product.vendor + ' / ' + this.props.product.title}
               />
                 <ShareButton
                   compact
                   socialMedia={'google-plus'}
-                  url={'https://www.giftingwild.com' + this.props.location.pathname}
+                  url={'https://floating-woodland-46616.herokuapp.com' + this.props.location.pathname}
                   media={this.props.variantImage}
                   text={this.props.product.vendor + ' / ' + this.props.product.title}
               />
                <ShareButton
                   compact
                   socialMedia={'twitter'}
-                  url={'https://www.giftingwild.com' + this.props.location.pathname}
+                  url={'https://floating-woodland-46616.herokuapp.com' + this.props.location.pathname}
                   media={this.props.variantImage}
                   text={this.props.product.vendor + ' / ' + this.props.product.title}
               />
                <ShareButton
                   compact
                   socialMedia={'pinterest'}
-                  url={'https://www.giftingwild.com' + this.props.location.pathname}
+                  url={'https://floating-woodland-46616.herokuapp.com' + this.props.location.pathname}
                   media={this.props.variantImage}
                   text={this.props.product.vendor + ' / ' + this.props.product.title}
               />
