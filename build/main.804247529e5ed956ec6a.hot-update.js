@@ -1,2 +1,0 @@
-exports.id="main",exports.modules={"./src/styles/app.css":function(n,o){throw new Error("Module build failed (from ./node_modules/css-loader/index.js):\nUnclosed block (467:1)\n\n  465 | }\n  466 | \n> 467 | @media all and (min-width: 1041px) {\n      | ^\n  468 | .mobileOptions {\n  469 |     display: none !important;\n  470 | }\n")}};
-//# sourceMappingURL=main.804247529e5ed956ec6a.hot-update.js.map

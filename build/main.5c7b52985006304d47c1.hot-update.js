@@ -1,2 +1,0 @@
-exports.id="main",exports.modules={"./src/components/Product/ProductTextOptions.js":function(o,r){throw new Error("Module build failed (from ./node_modules/eslint-loader/index.js):\nError: ENOENT: no such file or directory, open 'C:\\apps\\gw\\src\\components\\Product\\ProductTextOptions.js'")}};
-//# sourceMappingURL=main.5c7b52985006304d47c1.hot-update.js.map
