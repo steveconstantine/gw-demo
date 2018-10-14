@@ -323,7 +323,7 @@ class Product extends Component {
       accessibilityLabel="Cancel"
       bgColor="white"
       icon="cancel"
-      iconColor="black"
+      iconColor="darkGray"
       onClick={() => {this.handleModalClose()}}
     />
     </Box>
