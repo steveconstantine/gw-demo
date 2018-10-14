@@ -48,7 +48,6 @@
     "react-loadable": "^5.4.0",
     "react-loader-spinner": "^2.1.0",
     "react-modal": "^3.5.1",
-    "react-native-web": "^0.8.3",
     "react-router-dom": "^4.2.2",
     "react-router-hash-link": "^1.2.0",
     "react-slick": "^0.23.1",
