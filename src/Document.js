@@ -28,6 +28,8 @@ export default class Document extends React.Component {
           {helmet.link.toComponent()}
           {css}
           <link rel="stylesheet" href={assets.client.css} />
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" />
+          <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
         </head>
         <body {...bodyAttrs}>
           <AfterRoot />

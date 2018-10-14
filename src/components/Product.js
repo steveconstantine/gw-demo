@@ -35,8 +35,10 @@ class ModalLinkProduct extends React.Component {
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
-          height: 400 + 'px',
+          height: 'calc(200px + 25vh)',
           minWidth: '200px',
+          minHeight: '200px',
+          maxHeight: '400px'
         }
       };
 
@@ -203,9 +205,11 @@ class Product extends Component {
     let variant = this.state.selectedVariant || this.props.product.variants.edges[0].node
     let variantQuantity = this.state.selectedVariantQuantity || 1
     let variant_selectors = [];
+    let text_button_variant_selectors = [];
     if (this.props.product.variants.edges[0].node.selectedOptions.length > 1) {
     variant_selectors = this.props.product.options.map((option) => {
       return (
+        <Box paddingX={2}>
         <VariantSelector
           handleOptionChange={this.handleOptionChange}
           key={option.id.toString()}
@@ -214,6 +218,7 @@ class Product extends Component {
           variant={variant}
           selectedVariant={this.selectedVariant}
         />
+        </Box>
       );
     });
     } else {
@@ -234,9 +239,10 @@ class Product extends Component {
    const styles = {
   modalBackground: {
     backgroundImage: `url(${variantImage})`,
-    height: 'calc(40vh -47px)',
+    height: '100vh',
     minHeight: '100%',
-    marginBottom: '1vh !important',
+    width: '100vw',
+    marginBottom: '0 !important',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     backgroundSize: 'cover',
@@ -265,7 +271,7 @@ class Product extends Component {
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     backgroundSize: 'cover',
-    height: 400 + 'px',
+    height: '100vh',
     minWidth: '100vw',
   },
   modalContent: {
@@ -283,16 +289,16 @@ class Product extends Component {
   onRequestClose={() => this.handleModalClose()}
   closeTimeoutMS={50}
   style={{ overlay: {}, content: {          backgroundImage: `url(${variantImage})`,
-          height: 'calc(38vh -47px)',
-          minHeight: '280px',
-          marginBottom: '1vh !important',
+          height: '100vh',
+          minHeight: '100vh',
+          marginBottom: '0 !important',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
-          marginTop: '50px !important',
+          marginTop: '0 !important',
           marginLeft:'auto',
           marginRight: 'auto',
-          width: '50vw',
+          width: '100vw',
           zIndex: '5 !important',} }}
   contentLabel="Example Modal"
   portalClassName="ReactModalPortal"
@@ -311,22 +317,41 @@ class Product extends Component {
     describedby: "full_description"
   }}
 ><div style={{'background': 'rgba(255,255,255,0.35)', 'padding': '50px' }}>
+  <div className="just-donate" style={{'position': 'fixed', 'right': '22px', 'top': '22px'}}>
+    <Box padding={2}>
+    <IconButton
+      accessibilityLabel="Cancel"
+      bgColor="white"
+      icon="cancel"
+      iconColor="black"
+      onClick={() => {this.handleModalClose()}}
+    />
+    </Box>
+  </div>
+
         <Swipeable
                 onSwipingRight={() => this.goPreviousProduct()}
                 onSwipingLeft={() => this.goNextProduct()} >
               <Box display="flex" direction="row" paddingY={2}>
                   <Column span={12}>
                   <Box padding={2}>
-                    <div style={{'paddingTop': '25px'}}></div>
-                    {this.props.product.images.edges.length ? <img onLoad={this.props.handleImageLoaded} src={variantImage} style={{'maxHeight': '450px'}} alt={`${this.props.product.title} product shot`}/> : null}
-                  </Box>
                   <ProductDescriptionImage variantImage={variantImage} bioDescription={bioDescription} product={this.props.product} variant={variant} />
-                  <ProductOptions handleQuantityChange={this.handleQuantityChange} selectedVariantQuantity={this.state.selectedVariantQuantity} variant_selectors={variant_selectors} />
-                  <Button color="gray" disabled={ this.state.cartDisabled == true || variant.availableForSale === false ? true : false } text={ variant.availableForSale === true ? "Add to Cart" : "Out of Stock" } onClick={() => {this.props.addVariantToCart(variant.id, variantQuantity); this.handleModalCloseHash();}} style={{'marginBottom':'12px'}} />
+                    {this.props.product.images.edges.length ? <img onLoad={this.props.handleImageLoaded} src={variantImage} style={{'maxHeight': '450px'}} alt={`${this.props.product.title} product shot`}/> : null}
+                    <div className={'mobileOptions'}>
+                    <ProductOptions handleQuantityChange={this.handleQuantityChange} selectedVariantQuantity={this.state.selectedVariantQuantity} variant_selectors={variant_selectors} />
+                    <Button color="gray" disabled={ this.state.cartDisabled == true || variant.availableForSale === false ? true : false } text={ variant.availableForSale === true ? "Add to Cart" : "Out of Stock" } onClick={() => {this.props.addVariantToCart(variant.id, variantQuantity); this.handleModalCloseHash();}} style={{'marginBottom':'12px', 'position': 'fixed', 'right': '5px', 'bottom': '0', 'left': '5px'}} />
+                    </div>
+                  </Box>
                   <ProductSocial location={this.props.location} product={this.props.product} />
                 </Column>
               </Box>
             </Swipeable>
+            </div>
+            <div className={'desktopOptions'} style={{'width': '100vw', 'height': '126px', 'position': 'fixed', 'left': '0', 'bottom': '0', 'right': '0', 'display': 'block', 'background': 'rgba(0,0,0,0.45)', 'color': 'white'}}>
+              <ProductOptions handleQuantityChange={this.handleQuantityChange} selectedVariantQuantity={this.state.selectedVariantQuantity} variant_selectors={variant_selectors} />
+              <div style={{'position': 'fixed', 'bottom': '26px', 'right': '16px', 'width': '84px'}}>
+              <Button color="gray" disabled={ this.state.cartDisabled == true || variant.availableForSale === false ? true : false } text={ variant.availableForSale === true ? "Add to Cart" : "Out of Stock" } onClick={() => {this.props.addVariantToCart(variant.id, variantQuantity); this.handleModalCloseHash();}} style={{'marginBottom':'12px', 'position': 'fixed !important', 'right': '5px', 'bottom': '0', 'left': '5px'}} />
+              </div>
             </div>
             </ReactModal>
         </Box>

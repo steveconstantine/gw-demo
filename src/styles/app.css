@@ -464,6 +464,38 @@ a:active, a:focus, a {
   margin-bottom: 10px;
 }
 
+.productPriceOptions {
+  font-weight: bold;
+  color: #FFF;
+  text-align: center;
+  opacity: 1;
+  font-size: 20px;
+}
+
+@media all and (min-width: 1041px) {
+.mobileOptions {
+    display: none !important;
+}
+.socialOptions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 12px;
+}
+.productPriceOptions {
+position: fixed;
+bottom: 166px;
+left: 0;
+right: 0;
+}
+}
+
+@media all and (max-width: 1040px) {
+.desktopOptions {
+    display: none !important;
+}
+}
+
 .donations {
     margin-left: 10px;
     font-weight: 500;
@@ -879,17 +911,17 @@ footer {
 
 
   .ReactModal__Content {
-    position: absolute;
-    top: 75px;
-    left: 10vw;
-    right: 10vw;
-    bottom: 75px;
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     overflow-y: scroll;
   }
 
 @media all and (max-width: 768px) {
   .ReactModal__Content {
-    width: 70vw !important;
+    width: 100vw !important;
   }
 }
 

@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@jaredpalmer/after": "latest",
+    "@material-ui/core": "^3.2.0",
+    "@material-ui/icons": "^3.0.1",
     "apollo-cache-inmemory": "^1.2.2",
     "apollo-client": "^2.3.2",
     "apollo-link-context": "^1.0.8",

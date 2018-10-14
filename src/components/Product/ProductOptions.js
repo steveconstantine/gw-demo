@@ -6,10 +6,14 @@ class ProductOptions extends Component {
     render() {
       return (
       <div>
-        <div id="2" style={{'paddingTop': '15px'}}></div>
+        <div style={{'paddingTop': '15px'}}></div>
+        <Box color="transparent" padding={1} display="flex" direction="row" alignItems="center">
         {this.props.variant_selectors}
+        <Box paddingX={2}>
+        </Box>
+        <Box paddingX={2}>
         <label className="Product__option">
-           <span className="product_quantity" style={{'color': 'black', 'textAlign': 'left', 'opacity': '1'}}><Heading color="lightGray" size="xs">Quantity</Heading></span>
+           <div className="product_quantity" style={{'color': 'black', 'textAlign': 'left', 'opacity': '1', 'marginBottom': '12.5px'}}><Heading color="lightGray" size="xs">Quantity</Heading></div>
            <TextField
               id="quantity"
               min="1"
@@ -19,7 +23,9 @@ class ProductOptions extends Component {
               type={"number"}
             />
         </label>
-        <div id="3" style={{'paddingTop': '15px'}}></div>
+        </Box>
+        </Box>
+        <div style={{'paddingTop': '15px'}}></div>
       </div>
     );
   }
