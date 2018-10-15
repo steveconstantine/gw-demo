@@ -277,7 +277,7 @@ a:active, a:focus, a {
 .Cart__line-items {
   margin: 0;
   padding: 40px 20px;
-  max-height: 275px;
+  max-height: 100%;
   position: sticky;
 width: 100vw;
 background: white;
