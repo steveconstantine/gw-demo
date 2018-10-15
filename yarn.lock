@@ -4000,10 +4000,10 @@ gauge@~2.7.3:
     strip-ansi "^3.0.1"
     wide-align "^1.1.0"
 
-gestalt@^0.75.0:
-  version "0.75.0"
-  resolved "https://registry.yarnpkg.com/gestalt/-/gestalt-0.75.0.tgz#4300d7fcc0ca21de5d3ca5eca6c21e0316f11d12"
-  integrity sha1-QwDX/MDKId5dPKXspsIeAxbxHRI=
+gestalt@^0.82.0:
+  version "0.82.0"
+  resolved "https://registry.yarnpkg.com/gestalt/-/gestalt-0.82.0.tgz#e4fc770893c58154fb12931bd5bbda6070c49f5f"
+  integrity sha512-STuA1kQ+7uakLKKUuJhFV3C9Z3/WOeTe8THYDfnVdcdLskoM3Ys6zM2//51RK5xZwCfroiM5lHdRw7R8DKAsDw==
   dependencies:
     classnames "^2.2.5"
     prop-types "^15.6.0"

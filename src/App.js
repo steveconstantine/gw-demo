@@ -19,7 +19,6 @@ import {
 import Loader from 'react-loader-spinner';
 import { Tooltip, SegmentedControl, Heading, Column, Box, IconButton, Text, Flyout, Button } from 'gestalt';
 import { Scrollbars } from 'react-custom-scrollbars';
-import isMobile from 'ismobilejs';
 import Headroom from 'react-headroom';
 import Drawer from 'rc-drawer-menu';
 // import GWInfo from './components/Info/GWInfo';

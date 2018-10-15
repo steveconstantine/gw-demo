@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import LineItem from './LineItem';
-import { Button as CartButton, TextField, Box } from 'gestalt';
+import { Button as CartButton, TextField, Box, Layer } from 'gestalt';
 import DonationRadioButtonGroup from './RadioButtonGroup/DonationRadioButtonGroup';
 import _ from 'underscore';
+import isMobile from 'ismobilejs';
 
 const options = [
   {
@@ -119,27 +120,29 @@ class Cart extends Component {
       if (_.isNull(this.props.checkout) == false) {
        finalCheckoutValue = parseFloat(this.props.checkout.totalPrice,10) + parseFloat(finalDonation, 10);
      }
-
     return (
-      <div className={`Cart ${this.props.isCartOpen ? 'Cart--open' : ''}`}>
-        <header className="Cart__header">
+      <div>
+      { this.props.isCartOpen && (
+        <Layer>
+        <div style={{'background': 'white', 'display': 'grid', 'marginLeft': '25vw', 'minHeight': '100vh'}}>
+        <header className="Cart__header" style={{'position': 'relative', 'width': '75vw', 'background': 'white'}}>
           <h2>Cart</h2>
           <button
             onClick={this.props.handleCartClose}
-            className="Cart__close">
+            className="Cart__close" style={{'top': '15px !important'}}>
             ×
           </button>
         </header>
-        <ul className="Cart__line-items">
+        <ul className="Cart__line-items" style={{'position': 'relative', 'width': '75vw', 'minWidth': '335px', 'background': 'white'}}>
           {line_items}
         </ul>
-        <div className="Cart__donations">
-              <span className="donations">Donate Extra</span><br/>
+        <div className="Cart__donations" style={{'position': 'relative', 'width': '75vw', 'minWidth': '335px', 'background': 'white'}}>
+              <p className="donations donationsMobile" style={{'position': 'relative', 'width': '75vw', 'minWidth': '335px','background': 'white'}}>Donate Extra</p><br/>
               <DonationRadioButtonGroup items={options} value={moreSelected == 'true' ? 'moreSelected' : this.state.order}
                                 type="default" onClick={this.setDonationClick}/>
         </div>
           { moreSelected == true  ?
-        <div className="Cart__donations__more">
+        <div className="Cart__donations__more" style={{'position': 'relative', 'width': '75vw', 'minWidth': '335px', 'background': 'white'}}>
         <Box padding={3}>
               <TextField
           id="donate-more"
@@ -150,7 +153,7 @@ class Cart extends Component {
           />
           </Box>
         </div> : null }
-        <footer className="Cart__footer">
+        <footer className="Cart__footer" style={{'position': 'relative', 'width': '75vw', 'minWidth': '335px', 'background': 'white'}}>
           <div className="Cart-info clearfix">
             <div className="Cart-info__total Cart-info__small">Subtotal</div>
             <div className="Cart-info__pricing">
@@ -175,11 +178,13 @@ class Cart extends Component {
               <span className="pricing">$ { trueCheckout == false ? finalCheckoutValue.toFixed(2) : finalDonation} </span>
             </div>
           </div>
-          <CartButton color="white" text="Checkout" onClick={() => {window.open(this.props.checkout.webUrl)}}></CartButton>
+          <CartButton color="black" text="Checkout" onClick={() => {window.open(this.props.checkout.webUrl)}}></CartButton>
         </footer>
+        </div>
+        </Layer>
+      )}
       </div>
-    )
-  }
+    )}
 }
 
 export default Cart;
