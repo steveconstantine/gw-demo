@@ -166,7 +166,7 @@ class Cart extends Component {
           <div className="Cart-info clearfix">
             <div className="Cart-info__total Cart-info__small">Taxes</div>
             <div className="Cart-info__pricing">
-              <span className="pricing">$ {trueCheckout == false ? this.props.checkout.totalTax: 0.00}</span>
+              <span className="pricing">$ {trueCheckout == false ? this.props.checkout.totalTax : 0.00}</span>
             </div>
           </div>
           <div className="Cart-info clearfix">

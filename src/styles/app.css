@@ -240,7 +240,7 @@ a:active, a:focus, a {
   top: 0;
   right: 0;
   height: 100%;
-  width: 350px;
+  width: 335px;
   background-color: white;
   display: flex;
   flex-direction: column;
@@ -252,6 +252,7 @@ a:active, a:focus, a {
 .Cart--open {
   transform: translateX(0);
   background-color: #d3d9e0df !important;
+  -webkit-transform: translate3d(0,0,0) !important;
 }
 
 .Cart__close {
