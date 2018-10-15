@@ -6,7 +6,7 @@ class ProductDescriptionImage extends Component {
     render() {
       return (
         <div>
-            <Heading size="sm"><p style={{'color':'rgba(0,0,0, 1)', 'position': 'fixed', 'width': '400px', 'transform': 'translateY(-99px)'}}>{this.props.product.vendor} - {this.props.product.title}</p></Heading>
+            <Heading size="xs"><p style={{'color':'rgba(0,0,0, 1)', 'position': 'fixed', 'width': '280px', 'transform': 'translateY(-69px)'}}>{this.props.product.vendor} - {this.props.product.title}</p></Heading>
             <p className={'productPriceOptions'}> {this.props.variant.availableForSale == true ? '$' + this.props.variant.price.toString() : this.props.variant.title.toString() + ' is Out of Stock'}</p>
         </div>
     );

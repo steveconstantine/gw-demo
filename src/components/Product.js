@@ -36,7 +36,7 @@ class ModalLinkProduct extends React.Component {
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
           height: 'calc(200px + 25vh)',
-          minWidth: '200px',
+          minWidth: '185px',
           minHeight: '200px',
           maxHeight: '400px'
         }
@@ -316,7 +316,7 @@ class Product extends Component {
     labelledby: "heading",
     describedby: "full_description"
   }}
-><div style={{'background': 'rgba(255,255,255,0.35)', 'padding': '50px' }}>
+><div style={{'background': 'rgba(255,255,255,0.35)', 'padding': '25px' }}>
   <div className="just-donate" style={{'position': 'fixed', 'right': '22px', 'top': '22px'}}>
     <Box padding={2}>
     <IconButton

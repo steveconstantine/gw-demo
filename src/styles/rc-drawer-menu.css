@@ -5,6 +5,7 @@
   height: 100%;
   z-index: 9999;
   pointer-events: none;
+  -webkit-transform: translate3d(0,0,0) !important;
 }
 .drawer > * {
   transition: transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86), opacity 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86), box-shaow 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
