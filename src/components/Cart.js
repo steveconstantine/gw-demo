@@ -124,8 +124,8 @@ class Cart extends Component {
       <div>
       { this.props.isCartOpen && (
         <Layer>
-        <div style={{'background': 'white', 'display': 'grid', 'marginLeft': '0', 'minHeight': '100vh'}}>
-        <header className="Cart__header" style={{'position': 'relative', 'width': '100vw', 'background': 'white'}}>
+        <div style={{'background': 'white', 'display': 'inline-grid', 'marginLeft': '0', 'minHeight': '100vh'}}>
+        <header className="Cart__header" style={{'position': 'relative', 'width': '100vw', 'background': 'white', 'height': '100%'}}>
           <h2>Cart</h2>
           <button
             onClick={this.props.handleCartClose}
@@ -133,16 +133,16 @@ class Cart extends Component {
             ×
           </button>
         </header>
-        <ul className="Cart__line-items" style={{'position': 'relative', 'width': '100vw', 'minWidth': '335px', 'background': 'white'}}>
+        <ul className="Cart__line-items">
           {line_items}
         </ul>
-        <div className="Cart__donations" style={{'position': 'relative', 'width': '100vw', 'minWidth': '335px', 'background': 'white'}}>
-              <p className="donations donationsMobile" style={{'position': 'relative', 'width': '100vw', 'minWidth': '335px','background': 'white'}}>Donate Extra</p><br/>
+        <div className="Cart__donations" style={{'position': 'sticky', 'width': '100vw',  'background': 'white'}}>
+              <p className="donations donationsMobile" style={{'position': 'relative', 'width': '100vw', 'background': 'white'}}>Donate Extra</p>
               <DonationRadioButtonGroup items={options} value={moreSelected == 'true' ? 'moreSelected' : this.state.order}
                                 type="default" onClick={this.setDonationClick}/>
         </div>
           { moreSelected == true  ?
-        <div className="Cart__donations__more" style={{'position': 'relative', 'width': '100vw', 'minWidth': '335px', 'background': 'white'}}>
+        <div className="Cart__donations__more" style={{'position': 'sticky', 'width': '100vw',  'background': 'white'}}>
         <Box padding={3}>
               <TextField
           id="donate-more"
@@ -153,7 +153,7 @@ class Cart extends Component {
           />
           </Box>
         </div> : null }
-        <footer className="Cart__footer" style={{'position': 'relative', 'width': '100vw', 'minWidth': '335px', 'background': 'white'}}>
+        <footer className="Cart__footer" style={{'position': 'relative', 'width': '100vw',  'background': 'white'}}>
           <div className="Cart-info clearfix">
             <div className="Cart-info__total Cart-info__small">Subtotal</div>
             <div className="Cart-info__pricing">

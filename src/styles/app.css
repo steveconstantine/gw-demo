@@ -275,9 +275,14 @@ a:active, a:focus, a {
 }
 
 .Cart__line-items {
-  flex: 1 0 auto;
   margin: 0;
-  padding: 20px;
+  padding: 40px 20px;
+  max-height: 275px;
+  position: sticky;
+width: 100vw;
+background: white;
+overflow-y: scroll;
+bottom: 75px;
 }
 
 .Cart__footer {
@@ -506,7 +511,6 @@ right: 0;
 
 
 .donations {
-    margin-left: 10px;
     font-weight: 500;
     margin-bottom: 10px;
     font-size: 15px;
