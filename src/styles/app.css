@@ -471,6 +471,7 @@ a:active, a:focus, a {
   text-align: center;
   opacity: 1;
   font-size: 20px;
+  mix-blend-mode: difference;
 }
 
 @media all and (min-width: 1041px) {
@@ -495,7 +496,19 @@ right: 0;
 .desktopOptions {
     display: none !important;
 }
+.variantSelectors > div {
+  display: inline !important;
 }
+.productPriceOptions {
+  position: fixed;
+    bottom: 50px;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    z-index: 9999;
+}
+}
+
 
 .donations {
     margin-left: 10px;
@@ -845,6 +858,21 @@ footer {
 
 #header > div > div._0._3i._45._4x._77 > div > div {
   width: 20%;
+}
+
+._0 ._3r ._2u ._7c {
+  display: block;
+  width: 70vw;
+  max-width: 70vw;
+}
+
+._0 ._3r ._2u ._2 ._34 ._6x ._6y ._l {
+  display: inline !important;
+}
+
+._5o {
+    mix-blend-mode: difference;
+    margin-bottom: 10px;
 }
 
 .drawer-content {

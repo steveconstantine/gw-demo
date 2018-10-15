@@ -292,7 +292,7 @@ class Product extends Component {
           height: '100vh',
           minHeight: '100vh',
           marginBottom: '0 !important',
-          backgroundPosition: 'center',
+          backgroundPosition: 'bottom center',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
           marginTop: '0 !important',
@@ -317,7 +317,7 @@ class Product extends Component {
     describedby: "full_description"
   }}
 ><div style={{'background': 'rgba(255,255,255,0.35)', 'padding': '25px' }}>
-  <div className="just-donate" style={{'position': 'fixed', 'right': '22px', 'top': '22px'}}>
+  <div className="just-donate" style={{'position': 'fixed', 'right': '2px', 'top': '2px', 'zIndex': '9999'}}>
     <Box padding={2}>
     <IconButton
       accessibilityLabel="Cancel"
@@ -336,7 +336,7 @@ class Product extends Component {
                   <Column span={12}>
                   <Box padding={2}>
                   <ProductDescriptionImage variantImage={variantImage} bioDescription={bioDescription} product={this.props.product} variant={variant} />
-                    {this.props.product.images.edges.length ? <img onLoad={this.props.handleImageLoaded} src={variantImage} style={{'maxHeight': '450px'}} alt={`${this.props.product.title} product shot`}/> : null}
+                    {this.props.product.images.edges.length ? <img onLoad={this.props.handleImageLoaded} src={variantImage} style={{'maxHeight': '450px', 'paddingTop': '50px'}} alt={`${this.props.product.title} product shot`}/> : null}
                     <div className={'mobileOptions'}>
                     <ProductOptions handleQuantityChange={this.handleQuantityChange} selectedVariantQuantity={this.state.selectedVariantQuantity} variant_selectors={variant_selectors} />
                     <Button color="gray" disabled={ this.state.cartDisabled == true || variant.availableForSale === false ? true : false } text={ variant.availableForSale === true ? "Add to Cart" : "Out of Stock" } onClick={() => {this.props.addVariantToCart(variant.id, variantQuantity); this.handleModalCloseHash();}} style={{'marginBottom':'12px', 'position': 'fixed', 'right': '5px', 'bottom': '0', 'left': '5px'}} />
