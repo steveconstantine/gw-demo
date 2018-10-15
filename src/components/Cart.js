@@ -4,6 +4,7 @@ import { Button as CartButton, TextField, Box, Layer } from 'gestalt';
 import DonationRadioButtonGroup from './RadioButtonGroup/DonationRadioButtonGroup';
 import _ from 'underscore';
 import isMobile from 'ismobilejs';
+import ReactModal from 'react-modal';
 
 const options = [
   {
@@ -123,7 +124,39 @@ class Cart extends Component {
     return (
       <div>
       { this.props.isCartOpen && (
-        <Layer>
+        <ReactModal
+     isOpen={true}
+     onRequestClose={this.props.handleCartClose}
+     closeTimeoutMS={50}
+     style={{ overlay: {}, content: {          backgroundImage: `none`,
+           height: '100vh',
+           minHeight: '100vh',
+           marginBottom: '0 !important',
+           backgroundPosition: 'bottom center',
+           backgroundRepeat: 'no-repeat',
+           backgroundSize: 'cover',
+           marginTop: '0 !important',
+           marginLeft:'auto',
+           marginRight: 'auto',
+           width: '100vw',
+           zIndex: '5 !important',} }}
+     contentLabel="Example Modal"
+     portalClassName="ReactModalPortal"
+     overlayClassName="ReactModal__Overlay"
+     className="ReactModal__Content"
+     bodyOpenClassName="ReactModal__Body--open"
+     htmlOpenClassName="ReactModal__Html--open"
+     ariaHideApp={true}
+     shouldFocusAfterRender={true}
+     shouldCloseOnOverlayClick={true}
+     shouldCloseOnEsc={true}
+     shouldReturnFocusAfterClose={true}
+     role={"dialog"}
+     aria={{
+     labelledby: "heading",
+     describedby: "full_description"
+     }}
+     >
         <div style={{'background': 'white', 'display': 'inline-grid', 'marginLeft': '0', 'minHeight': '100vh'}}>
         <header className="Cart__header" style={{'position': 'relative', 'width': '100vw', 'background': 'white', 'height': '100%'}}>
           <h2>Cart</h2>
@@ -181,7 +214,7 @@ class Cart extends Component {
           <CartButton color="black" text="Checkout" onClick={() => {window.open(this.props.checkout.webUrl)}}></CartButton>
         </footer>
         </div>
-        </Layer>
+        </ReactModal>
       )}
       </div>
     )}
