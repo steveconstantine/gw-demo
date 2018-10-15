@@ -6,7 +6,6 @@ class ProductSocial extends Component {
     render() {
       return (
       <div className={'socialOptions'}>
-        <div style={{'paddingTop': '25px'}}></div>
           <Box display="flex" alignContent="center" justifyContent="center">
         ``  <Box display="flex" column={6} alignContent="center" justifyContent="center" flexGrow="2">
                <ShareButton

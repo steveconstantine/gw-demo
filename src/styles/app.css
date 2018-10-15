@@ -499,14 +499,6 @@ right: 0;
 .variantSelectors > div {
   display: inline !important;
 }
-.productPriceOptions {
-  position: fixed;
-    bottom: 50px;
-    left: 0;
-    right: 0;
-    width: 100vw;
-    z-index: 9999;
-}
 }
 
 

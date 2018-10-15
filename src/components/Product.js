@@ -316,7 +316,7 @@ class Product extends Component {
     labelledby: "heading",
     describedby: "full_description"
   }}
-><div style={{'background': 'rgba(255,255,255,0.35)', 'padding': '25px' }}>
+><div style={{'background': 'rgba(255,255,255,0.35)', 'padding': '25px', 'minHeight': '100vh' }}>
   <div className="just-donate" style={{'position': 'fixed', 'right': '2px', 'top': '2px', 'zIndex': '9999'}}>
     <Box padding={2}>
     <IconButton
@@ -339,6 +339,7 @@ class Product extends Component {
                     {this.props.product.images.edges.length ? <img onLoad={this.props.handleImageLoaded} src={variantImage} style={{'maxHeight': '450px', 'paddingTop': '50px'}} alt={`${this.props.product.title} product shot`}/> : null}
                     <div className={'mobileOptions'}>
                     <ProductOptions handleQuantityChange={this.handleQuantityChange} selectedVariantQuantity={this.state.selectedVariantQuantity} variant_selectors={variant_selectors} />
+                    <p className={'productPriceOptions'}> {variant.availableForSale == true ? '$' + variant.price.toString() : variant.title.toString() + ' is Out of Stock'}</p>
                     <Button color="gray" disabled={ this.state.cartDisabled == true || variant.availableForSale === false ? true : false } text={ variant.availableForSale === true ? "Add to Cart" : "Out of Stock" } onClick={() => {this.props.addVariantToCart(variant.id, variantQuantity); this.handleModalCloseHash();}} style={{'marginBottom':'12px', 'position': 'fixed', 'right': '5px', 'bottom': '0', 'left': '5px'}} />
                     </div>
                   </Box>
