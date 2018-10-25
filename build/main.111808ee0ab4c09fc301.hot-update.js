@@ -1,0 +1,2 @@
+exports.id="main",exports.modules={"./src/styles/app.css":function(n,e){throw new Error("Module build failed (from ./node_modules/css-loader/index.js):\nUnexpected } (489:1)\n\n  487 | }\n  488 | \n> 489 | }\n      | ^\n  490 | \n  491 | @media all and (min-width: 1041px) {\n  492 | .mobileOptions {\n")}};
+//# sourceMappingURL=main.111808ee0ab4c09fc301.hot-update.js.map

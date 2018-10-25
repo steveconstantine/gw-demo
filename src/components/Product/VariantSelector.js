@@ -36,7 +36,7 @@ class VariantSelector extends Component {
 
     return (
       <div>
-       <span className="Variant_Name" style={{'color': 'black', 'textAlign': 'left', 'opacity': '1', 'mixBlendMode': 'difference'}}><Heading color="lightGray" size="xs">{this.props.option.name}</Heading></span>
+       <span className="Variant_Name" style={{ 'color': 'black', 'textAlign': 'center', 'opacity': '1'}}><Heading color="darkGray" size="xs">{this.props.option.name}</Heading></span>
                 <RadioButtonGroup items={variantValues} value={this.state.order} onClick={(value) => {this.setState({order: value}); this.props.handleOptionChange(value, this.props.option.name)}}
                                   type="default"/>
       </div>

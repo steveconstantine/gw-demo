@@ -289,6 +289,7 @@ class Product extends Component {
   onRequestClose={() => this.handleModalClose()}
   closeTimeoutMS={50}
   style={{ overlay: {}, content: {          backgroundImage: `url(${variantImage})`,
+  backgroudnBlendMode: 'difference',
           height: '100vh',
           minHeight: '100vh',
           marginBottom: '0 !important',
@@ -339,21 +340,50 @@ class Product extends Component {
                     {this.props.product.images.edges.length ? <img onLoad={this.props.handleImageLoaded} src={variantImage} style={{'maxHeight': '450px', 'paddingTop': '50px'}} alt={`${this.props.product.title} product shot`}/> : null}
                     <div className={'mobileOptions'}>
                     <ProductOptions handleQuantityChange={this.handleQuantityChange} selectedVariantQuantity={this.state.selectedVariantQuantity} variant_selectors={variant_selectors} />
-                    <p className={'productPriceOptions'}> {variant.availableForSale == true ? '$' + variant.price.toString() : variant.title.toString() + ' is Out of Stock'}</p>
+                    <label className="Product__option">
+                      <div style={{'maxWidth': '100%'}}>
+                       <TextField
+                          id="quantity"
+                          min="1"
+                          onChange={(value) => this.props.handleQuantityChange(value)}
+                          placeholder="Quantity"
+                          value={this.props.selectedVariantQuantity}
+                          type={"number"}
+                        />
+                        </div>
+                    </label>
+                    <p className={'productPriceOptions'}><span style={{'color': 'black'}}> {variant.availableForSale == true ? '$' + variant.price.toString() + ' / ea' : variant.title.toString() + ' is Out of Stock'}</span></p>
                     <Button color="gray" disabled={ this.state.cartDisabled == true || variant.availableForSale === false ? true : false } text={ variant.availableForSale === true ? "Add to Cart" : "Out of Stock" } onClick={() => {this.props.addVariantToCart(variant.id, variantQuantity); this.handleModalCloseHash();}} style={{'marginBottom':'12px', 'position': 'fixed', 'right': '5px', 'bottom': '0', 'left': '5px'}} />
                     </div>
                   </Box>
-                  <ProductSocial location={this.props.location} product={this.props.product} />
                 </Column>
               </Box>
             </Swipeable>
             </div>
-            <div className={'desktopOptions'} style={{'width': '100vw', 'height': '126px', 'position': 'fixed', 'left': '0', 'bottom': '0', 'right': '0', 'display': 'block', 'background': 'rgba(0,0,0,0.45)', 'color': 'white'}}>
+            <div className={'desktopOptions'} style={{'width': '33vw', 'height': '100vh', 'position': 'fixed', 'top': '56px', 'right': '0', 'display': 'block', 'background': 'rgba(0,0,0,0.45)', 'color': 'white'}}>
               <ProductOptions handleQuantityChange={this.handleQuantityChange} selectedVariantQuantity={this.state.selectedVariantQuantity} variant_selectors={variant_selectors} />
-              <div style={{'position': 'fixed', 'bottom': '26px', 'right': '16px', 'width': '84px'}}>
-              <Button color="gray" disabled={ this.state.cartDisabled == true || variant.availableForSale === false ? true : false } text={ variant.availableForSale === true ? "Add to Cart" : "Out of Stock" } onClick={() => {this.props.addVariantToCart(variant.id, variantQuantity); this.handleModalCloseHash();}} style={{'marginBottom':'12px', 'position': 'fixed !important', 'right': '5px', 'bottom': '0', 'left': '5px'}} />
+              <div style={{'display': 'inline'}}>
+              <p className={'productPriceOptions'}><span style={{'color': '#222', 'fontFamily': 'LiberationSansRegular'}}> {variant.availableForSale == true ? '$' + variant.price.toString() + ' / ea': variant.title.toString() + ' is Out of Stock'}</span></p>
+              </div>
+              <div style={{'display': 'inline', 'width': '33vw'}}>
+              <label className="Product__option">
+                <div style={{'maxWidth': '22vw'}}>
+                 <TextField
+                    id="quantity"
+                    min="1"
+                    onChange={(value) => this.props.handleQuantityChange(value)}
+                    placeholder="Quantity"
+                    value={this.props.selectedVariantQuantity}
+                    type={"number"}
+                  />
+                  </div>
+                  <div style={{'width': '9vw', 'marginLeft': 'calc(23vw + 4px)', 'transform': 'translateY(-63px)'}}>
+                  <Button color="gray" disabled={ this.state.cartDisabled == true || variant.availableForSale === false ? true : false } text={ variant.availableForSale === true ? "Add to Cart" : "Out of Stock" } onClick={() => {this.props.addVariantToCart(variant.id, variantQuantity); this.handleModalCloseHash();}} style={{'marginBottom':'12px', 'position': 'fixed !important', 'right': '5px', 'bottom': '0', 'left': '5px'}} />
+                  </div>
+              </label>
               </div>
             </div>
+            <ProductSocial location={this.props.location} product={this.props.product} />
             </ReactModal>
         </Box>
       </div>

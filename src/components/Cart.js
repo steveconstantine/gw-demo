@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import LineItem from './LineItem';
-import { Button as CartButton, TextField, Box, Layer } from 'gestalt';
+import { Button as CartButton, TextField, Box, Layer, IconButton } from 'gestalt';
 import DonationRadioButtonGroup from './RadioButtonGroup/DonationRadioButtonGroup';
 import _ from 'underscore';
 import isMobile from 'ismobilejs';
@@ -128,7 +128,7 @@ class Cart extends Component {
      isOpen={true}
      onRequestClose={this.props.handleCartClose}
      closeTimeoutMS={50}
-     style={{ overlay: {}, content: {          backgroundImage: `none`,
+     style={{ overlay: {}, content: {          background: `rgba(255,255,255,0.8)`,
            height: '100vh',
            minHeight: '100vh',
            marginBottom: '0 !important',
@@ -157,25 +157,31 @@ class Cart extends Component {
      describedby: "full_description"
      }}
      >
-        <div style={{'background': 'white', 'display': 'inline-grid', 'marginLeft': '0', 'minHeight': '100vh'}}>
-        <header className="Cart__header" style={{'position': 'relative', 'width': '100vw', 'background': 'white', 'height': '100%'}}>
+        <div style={{ 'display': 'inline-grid', 'marginLeft': '0', 'minHeight': '100vh'}}>
+        <header className="Cart__header" style={{'position': 'relative', 'width': '100vw', 'height': '100%'}}>
           <h2>Cart</h2>
-          <button
-            onClick={this.props.handleCartClose}
-            className="Cart__close" style={{'top': '15px !important'}}>
-            ×
-          </button>
+          <div className="just-donate" style={{'position': 'fixed', 'right': '2px', 'top': '2px', 'zIndex': '9999'}}>
+            <Box padding={2}>
+            <IconButton
+              accessibilityLabel="Cancel"
+              bgColor="white"
+              icon="cancel"
+              iconColor="darkGray"
+              onClick={this.props.handleCartClose}
+            />
+            </Box>
+          </div>
         </header>
-        <ul className="Cart__line-items">
+        <ul className="Cart__line-items" style={{'maxHeight': '280px', 'overflow': 'scroll'}}>
           {line_items}
         </ul>
-        <div className="Cart__donations" style={{'position': 'sticky', 'width': '100vw',  'background': 'white'}}>
-              <p className="donations donationsMobile" style={{'position': 'relative', 'width': '100vw', 'background': 'white'}}>Donate Extra</p>
+        <div className="Cart__donations" style={{'position': 'sticky', 'width': '100vw',  }}>
+              <p className="donations donationsMobile" style={{'position': 'relative', 'width': '100vw'}}>Donate Extra</p>
               <DonationRadioButtonGroup items={options} value={moreSelected == 'true' ? 'moreSelected' : this.state.order}
                                 type="default" onClick={this.setDonationClick}/>
         </div>
           { moreSelected == true  ?
-        <div className="Cart__donations__more" style={{'position': 'sticky', 'width': '100vw',  'background': 'white'}}>
+        <div className="Cart__donations__more" style={{'position': 'sticky', 'width': '100vw',  }}>
         <Box padding={3}>
               <TextField
           id="donate-more"
@@ -186,7 +192,7 @@ class Cart extends Component {
           />
           </Box>
         </div> : null }
-        <footer className="Cart__footer" style={{'position': 'relative', 'width': '100vw',  'background': 'white'}}>
+        <footer className="Cart__footer" style={{'position': 'relative', 'width': '100vw',  }}>
           <div className="Cart-info clearfix">
             <div className="Cart-info__total Cart-info__small">Subtotal</div>
             <div className="Cart-info__pricing">

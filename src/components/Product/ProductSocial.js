@@ -6,8 +6,8 @@ class ProductSocial extends Component {
     render() {
       return (
       <div className={'socialOptions'}>
-          <Box display="flex" alignContent="center" justifyContent="center">
-        ``  <Box display="flex" column={6} alignContent="center" justifyContent="center" flexGrow="2">
+          <Box display="flex" alignContent="flex-end" justifyContent="flex-end">
+            <Box display="flex" column={6} alignContent="center" width="100%" justifyContent="flex-end" flexGrow="2">
                <ShareButton
                   compact
                   socialMedia={'facebook'}

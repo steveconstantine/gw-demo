@@ -75,6 +75,10 @@ a:active, a:focus, a {
   font-weight: 20;
 }
 
+._r7 {
+    padding: 16px 14px;
+}
+
 /* BASE APP
  * ============================== */
 .react-drawer-overlay {
@@ -280,7 +284,6 @@ a:active, a:focus, a {
   max-height: 100%;
   position: sticky;
 width: 100vw;
-background: white;
 overflow-y: scroll;
 bottom: 75px;
 }
@@ -326,15 +329,15 @@ bottom: 75px;
   margin-bottom: 20px;
   overflow: hidden;
   backface-visibility: visible;
-  min-height: 65px;
+  min-height: 130px;
   position: relative;
   opacity: 1;
   transition: opacity 0.2s ease-in-out;
 }
 
 .Line-item__img {
-  width: 65px;
-  height: 65px;
+  width: 130px;
+  height: 130px;
   border-radius: 3px;
   background-size: contain;
   background-repeat: no-repeat;
@@ -345,7 +348,7 @@ bottom: 75px;
 
 .Line-item__content {
   width: 100%;
-  padding-left: 75px;
+  padding-left: 135px;
 }
 
 .Line-item__content-row {
@@ -358,22 +361,21 @@ bottom: 75px;
 .Line-item__variant-title {
   float: right;
   font-weight: bold;
-  font-size: 11px;
-  line-height: 17px;
+  font-size: 20px;
+  line-height: 25px;
   color: #767676;
 }
 
 .Line-item__title {
   color: #4E5665;
-  font-size: 15px;
+  font-size: 22px;
   font-weight: 400;
 }
 
 .Line-item__price {
-  line-height: 23px;
+  line-height: 28px;
   float: right;
-  font-weight: bold;
-  font-size: 15px;
+  font-size: 22px;
   margin-right: 40px;
 }
 
@@ -428,9 +430,10 @@ bottom: 75px;
   top: 0;
   border: 0;
   background: 0;
-  font-size: 20px;
+  font-size: 38px;
   top: -4px;
   opacity: 0.5;
+  transform: translateY(-4px);
 }
 
 .Line-item__remove:hover {
@@ -471,12 +474,16 @@ bottom: 75px;
 }
 
 .productPriceOptions {
-  font-weight: bold;
-  color: #FFF;
+  color: black;
   text-align: center;
   opacity: 1;
   font-size: 20px;
-  mix-blend-mode: difference;
+  background: rgba(255,255,255,0.7) !important;
+  padding: 10px 20px;
+  border-radius: 4px;
+  border: 1px solid black;
+  width: calc(100% - 20px);
+  margin-left: 10px;
 }
 
 @media all and (min-width: 1041px) {
@@ -485,15 +492,19 @@ bottom: 75px;
 }
 .socialOptions {
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 12px;
+    right: 5px;
+    bottom: -121px;
 }
 .productPriceOptions {
-position: fixed;
-bottom: 166px;
-left: 0;
-right: 0;
+margin-top: -25px;
+}
+.variantSelectors > div {
+  display: inline !important;
+  margin-top: -24px;
+}
+#quantity {
+  width: calc(33vw - 156px);
+  margin-left: 70px;
 }
 }
 
@@ -507,8 +518,48 @@ right: 0;
 .drawer {
   display: none !important;
 }
+
+.socialOptions {
+    position: fixed;
+    right: 5px;
+    bottom: -121px;
+}
 }
 
+#quantity, .product_quantity {
+  background: rgba(255,255,255,0.7) !important;
+  padding: 10px;
+  border-radius: 4px;
+  margin: 10px 5px;
+  font-size: 24px;
+  mix-blend-mode: normal !important;
+}
+
+.product_quantity::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: red;
+    opacity: 1; /* Firefox */
+}
+
+.product_quantity:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: red;
+}
+
+.product_quantity::-ms-input-placeholder { /* Microsoft Edge */
+    color: red;
+}
+
+.product_quantity > h5{
+  color: #121212;
+}
+
+.Variant_Name > h5 {
+   background: rgba(255,255,255,0.7) !important;
+   padding: 5px;
+   border-radius: 4px;
+  margin: 10px 0;
+   border: 1px solid black;
+   mix-blend-mode: luminosity !important;
+}
 
 .donations {
     font-weight: 500;
@@ -879,7 +930,6 @@ footer {
 }
 
 ._5o {
-    mix-blend-mode: difference;
     margin-bottom: 10px;
 }
 
@@ -1039,4 +1089,17 @@ width: 100vw;
   left: 0;
   right: 0;
   bottom: 0;
+}
+
+.product_page_title {
+  width: 100vw;
+  height: 56px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  display: block;
+  background: rgba(255,255,255,0.55);
+  color: black;
+  mix-blend-mode: luminosity !important;
 }

@@ -8,13 +8,13 @@ var localStorage = require('web-storage')().localStorage;
 
 export function createApolloClient() {
   const ssrMode = !process.browser;
-  const httpLink = createHttpLink({ uri: 'https://graphql.myshopify.com/api/graphql', fetch: fetch })
+  const httpLink = createHttpLink({ uri: 'https://giftingwildinc.myshopify.com/api/graphql', fetch: fetch })
 
   const token = localStorage.get('token');
 
   const middlewareLink = setContext(() => ({
     headers: {
-      'X-Shopify-Storefront-Access-Token': 'dd4d4dc146542ba7763305d71d1b3d38'
+      'X-Shopify-Storefront-Access-Token': 'e533f252f3a673c02f85798859530319'
     },
     authorization: token ? `Bearer ${token}` : "",
   }))
