@@ -39,6 +39,16 @@ class ModalLinkProduct extends React.Component {
           minWidth: '185px',
           minHeight: '200px',
           maxHeight: '400px'
+        },
+        titleAppearance: {
+          borderRadius: '0 5px 5px 0',
+          transform:'translateY(200px)',
+          marginRight: '5%',
+          padding: '1px 0px 1px 0px',
+          background: 'rgba(255,255,255,0.44)'
+        },
+        titleHide: {
+          display: 'none'
         }
       };
 
@@ -50,6 +60,7 @@ class ModalLinkProduct extends React.Component {
           path={`/art/${product.vendor.replace(" ","-").toLowerCase().toString()}-${product.title.replace(" ","-").toLowerCase().toString()}`}
           parentPath='/'
           component={Product}
+          enabled={true}
           props={{
           addVariantToCart: this.props.addVariantToCart,
           client: this.props.client,
@@ -62,10 +73,10 @@ class ModalLinkProduct extends React.Component {
           handleImageLoaded: this.props.handleImageLoaded
         }}>
               <BackgroundImage style={styles.homeBackground} src={variantImage} placeholder={variantImage} key={this.props.product.name}>
-                <div className="Product_title__overlay" style={{'borderRadius': '0 5px 5px 0', 'transform':'translateY(200px)', 'marginRight': '5%', 'padding': '1px 0px 1px 0px', 'background': 'rgba(255,255,255,0.44)'}}>
+                <div style={this.props.cartOpen == true ? styles.titleHide : styles.titleAppearance}>
                 <h5 className="Product__title" style={{'paddingLeft':'16px', 'marginBottom': '0', 'zIndex':'4', 'color' : 'rgba(0,0,0,0.8)'}}>{this.props.product.title}</h5>
                 <h5 className="Product__vendor" style={{'paddingLeft':'16px', 'marginTop': '2px', 'zIndex': '4','color' : 'rgba(0,0,0,0.8)'}}>{this.props.product.vendor}</h5>
-                </div>
+                </div> }
                 <Box alignItems="center" display="flex" alignSelf="center" justifyContent="center" >
                   <Box padding={1}>
                   </Box>

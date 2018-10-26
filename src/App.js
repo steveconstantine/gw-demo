@@ -28,6 +28,7 @@ import Loadable from 'react-loadable';
 import Slider from "react-slick";
 import { withRouter } from "react-router-dom";
 import BackgroundImage from 'react-background-image-loader';
+import Scrollable from 'sc-hide-scrollbar-react';
 import './styles/DonationRadioButtonGroup.css';
 import './styles/gestalt.css';
 import './styles/RadioButtonGroup.css';
@@ -37,6 +38,7 @@ import './styles/rodal.css';
 import './styles/slick.css';
 import './styles/slick-theme.css';
 import './styles/app.css';
+import './styles/Scrollable.css';
 
 var localStorage = require('web-storage')().localStorage;
 
@@ -330,6 +332,7 @@ class Home extends Component {
           selectedVariant={this.selectedVariant}
           isSliding={this.state.isSliding}
           handleImageLoaded={() => this.handleImageLoaded(index)}
+          cartOpen={this.state.isCartOpen == true ? true : false }
         />);
       } else {
         donationVariantId =  product.node.variants.edges[0].node.id;
@@ -338,11 +341,7 @@ class Home extends Component {
     }, []);
 
     return (
-         <Scrollbars
-          style={{ 'position' : 'fixed', 'top': '0', 'left': '0', 'right': '0', 'bottom': '0', 'width': 'auto', 'height': 'auto' }}
-          autoHide
-          autoHideTimeout={1000}
-          autoHideDuration={200}>
+        <Scrollable>
           <Headroom id={'header'} className={'header nav-down'}
             style={{
             WebkitTransition: 'all .5s ease-in-out',
@@ -449,7 +448,7 @@ class Home extends Component {
               </Box>
             </Box>
           </Headroom>
-          <div className="App" id="App" style={{'background': 'url(/bg_aqua.jpg)'}}>
+          <div className="App" id="App" style={{'background': 'url(/skye-whalesong8x32.jpg)'}}>
           <div className="Flash__message-wrapper">
               <p className={`Flash__message ${this.state.accountVerificationMessage ? 'Flash__message--open' : ''}`}>We have sent you an email, please click the link included to verify your email address</p>
             </div>
@@ -464,7 +463,7 @@ class Home extends Component {
             </div>
           <div className="just-donate" style={{'display': 'flex', 'justifyContent': 'flex-end', 'marginTop': '420px'}}>
             <Box padding={2}>
-              <Button color="transparent" text="Donate Extra" size="lg" onClick={this.handleCartOpen}/>
+              { this.state.isCartOpen == false ? <Button color="transparent" text="Donate Extra" size="lg" onClick={this.handleCartOpen}/> : null }
             </Box>
           </div>
           <Box>
@@ -486,6 +485,7 @@ class Home extends Component {
             }
           </div>
             {this.state.opentool && (
+              <div className="tooltip_container" style={{'position': 'fixed', 'bottom': '100px', 'right': '440px', 'borderRadius': '45px'}}>
               <Tooltip
                 size="xl"
                 anchor={this.anchortool}
@@ -496,10 +496,11 @@ class Home extends Component {
                   Copyright © 2018 - Gifting Wild Inc. Art and Their Prints Are Trademark / Registered / Copyright of Respective Artist(s).
                 </Text>
               </Tooltip>
+              </div>
             )}
           </Box>
         </div>
-      </Scrollbars>
+      </Scrollable>
     );
   }
 }

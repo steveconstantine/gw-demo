@@ -1,2 +1,0 @@
-exports.id="main",exports.modules={"./src/styles/app.css":function(n,e){throw new Error("Module build failed (from ./node_modules/css-loader/index.js):\nUnexpected } (543:1)\n\n  541 | }\n  542 | \n> 543 | }\n      | ^\n  544 | \n  545 | .product_quantity > h5{\n  546 |   color: #121212;\n")}};
-//# sourceMappingURL=main.4a128748cf4171c75397.hot-update.js.map

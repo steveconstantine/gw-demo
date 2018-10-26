@@ -21,7 +21,9 @@ body {
   padding: 0;
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  height: 100vh;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
@@ -68,15 +70,52 @@ a:active, a:focus, a {
     outline: -webkit-focus-ring-color auto 0;
 }
 
+[type=reset], [type=submit], button, html [type=button] {
+    -webkit-appearance: button;
+    opacity: 1;
+}
+
 ._si {
   font-family: 'LiberationSansRegular';
   font-weight: normal;
   font-style: normal;
   font-weight: 20;
 }
-
 ._r7 {
     padding: 16px 14px;
+}
+
+._3l > div {
+  font-size: 36px;
+  padding: 0 50px;
+}
+
+._6s {
+  position: -webkit-sticky; /* Safari */
+position: sticky;
+bottom: 15px;
+}
+
+.invis {
+  opacity: 0
+}
+
+.vis {
+  opacity: 1;
+}
+
+.opacity_animation {
+  -webkit-transition: opacity 0.3s ease-in-out;
+  -moz-transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out;
+}
+
+
+.tooltip_container > div{
+  top: auto;
+  left: auto;
+  right: auto;
+  bottom: auto;
 }
 
 /* BASE APP
@@ -90,7 +129,7 @@ a:active, a:focus, a {
   background: white !important;
   overflow-y: scroll;
 }
-@media all and (min-width: 1501px) {
+@media all and (min-width: 1401px) {
  .App {
      overflow-x: hidden;
      overflow-y: hidden;
@@ -101,10 +140,11 @@ a:active, a:focus, a {
      bottom: 0;
      background-size: cover !important;
      transition: background-image 0.4s ease-in-out;
+     height: 200vh;
  }
 }
 
- @media all and (max-width: 1500px) {
+ @media all and (max-width: 1400px) {
    .App {
        overflow-x: hidden;
        overflow-y: hidden;
@@ -114,6 +154,7 @@ a:active, a:focus, a {
        right: 0;
        top: 0;
        bottom: 0;
+       height: 200vh;
  }
 }
 
@@ -259,7 +300,7 @@ a:active, a:focus, a {
   -webkit-transform: translate3d(0,0,0) !important;
 }
 
-.Cart__close {
+.Cart__close *{
   position: absolute;
   right: 9px;
   top: 8px;
@@ -327,12 +368,13 @@ bottom: 75px;
  * ============================== */
 .Line-item {
   margin-bottom: 20px;
-  overflow: hidden;
+  overflow: auto;
   backface-visibility: visible;
   min-height: 130px;
   position: relative;
   opacity: 1;
   transition: opacity 0.2s ease-in-out;
+  list-stylE: none;
 }
 
 .Line-item__img {
@@ -439,6 +481,10 @@ bottom: 75px;
 .Line-item__remove:hover {
   opacity: 1;
   cursor: pointer;
+}
+
+.appcontainer {
+  height: 100VH;
 }
 
 /* PRODUCTS
@@ -838,6 +884,14 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
   overflow-y: scroll;
 }
 
+.addToCartButton {
+  height: 375px;
+    justify-content: center;
+    align-items: center;
+    vertical-align: middle;
+    display: flex;
+}
+
 main {
     flex-grow: 1;
 }
@@ -1077,7 +1131,7 @@ footer {
 .blue {
   position: absolute;
 left: 0;
-top: 69px;
+top: 73px;
 height: 400px;
 width: 100vw;
 }

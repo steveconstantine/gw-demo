@@ -5,6 +5,7 @@ import DonationRadioButtonGroup from './RadioButtonGroup/DonationRadioButtonGrou
 import _ from 'underscore';
 import isMobile from 'ismobilejs';
 import ReactModal from 'react-modal';
+import VirtualList from 'react-tiny-virtual-list';
 
 const options = [
   {
@@ -121,6 +122,22 @@ class Cart extends Component {
       if (_.isNull(this.props.checkout) == false) {
        finalCheckoutValue = parseFloat(this.props.checkout.totalPrice,10) + parseFloat(finalDonation, 10);
      }
+
+     if (line_items.length < 1) {
+       line_items.push(<div className="addToCartButton">
+                       <Box padding={2} justifyContent="center" alignItems="center" display="flex" marginTop="100px">
+                       <CartButton
+                          dangerouslySetInlineStyle={{
+                            __style: {
+                              fontSize: '36px !important',
+                              padding: '0 50px !important'
+                            },
+                          }}
+                          size="lg" color="transparent" text="Add Items To Cart" onClick={this.props.handleCartClose}></CartButton>
+                       </Box>
+                 </div>);
+     }
+
     return (
       <div>
       { this.props.isCartOpen && (
@@ -128,7 +145,7 @@ class Cart extends Component {
      isOpen={true}
      onRequestClose={this.props.handleCartClose}
      closeTimeoutMS={50}
-     style={{ overlay: {}, content: {          background: `rgba(255,255,255,0.8)`,
+     style={{ overlay: {}, content: {          background: `rgba(255,255,255,0.4)`,
            height: '100vh',
            minHeight: '100vh',
            marginBottom: '0 !important',
@@ -159,7 +176,6 @@ class Cart extends Component {
      >
         <div style={{ 'display': 'inline-grid', 'marginLeft': '0', 'minHeight': '100vh'}}>
         <header className="Cart__header" style={{'position': 'relative', 'width': '100vw', 'height': '100%'}}>
-          <h2>Cart</h2>
           <div className="just-donate" style={{'position': 'fixed', 'right': '2px', 'top': '2px', 'zIndex': '9999'}}>
             <Box padding={2}>
             <IconButton
@@ -172,9 +188,17 @@ class Cart extends Component {
             </Box>
           </div>
         </header>
-        <ul className="Cart__line-items" style={{'maxHeight': '280px', 'overflow': 'scroll'}}>
-          {line_items}
-        </ul>
+        <VirtualList
+width='100%'
+height={375}
+itemCount={line_items.length}
+itemSize={150}
+renderItem={({index}) =>
+  <div key={index}>
+  {line_items[index]}
+  </div>
+}
+/>
         <div className="Cart__donations" style={{'position': 'sticky', 'width': '100vw',  }}>
               <p className="donations donationsMobile" style={{'position': 'relative', 'width': '100vw'}}>Donate Extra</p>
               <DonationRadioButtonGroup items={options} value={moreSelected == 'true' ? 'moreSelected' : this.state.order}
