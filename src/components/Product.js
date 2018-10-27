@@ -12,7 +12,7 @@ import ProductDescriptionImage from './Product/ProductDescriptionImage';
 
 // import Info from './Info/Info';
 import { Box, Column, TextField, Toast, IconButton, Heading, Button, Image } from 'gestalt';
-import { ModalLink } from 'sc-react-router-modal';
+import { ModalLink } from 'gw-react-router-modal';
 import Swipeable from 'react-swipeable';
 import Rodal from 'sc-rodal';
 import isMobile from 'ismobilejs';
@@ -63,7 +63,6 @@ class ModalLinkProduct extends React.Component {
           enabled={true}
           props={{
           addVariantToCart: this.props.addVariantToCart,
-          client: this.props.client,
           checkout: this.props.checkout,
           key: product.id.toString(),
           product: product,
@@ -329,7 +328,7 @@ class Product extends Component {
     describedby: "full_description"
   }}
 ><div style={{'background': 'rgba(255,255,255,0.35)', 'padding': '25px', 'minHeight': '100vh' }}>
-  <div className="just-donate" style={{'position': 'fixed', 'right': '2px', 'top': '2px', 'zIndex': '9999'}}>
+  <div className="just-donate" style={{'position': 'fixed', 'right': '12px', 'top': '2px', 'zIndex': '9999'}}>
     <Box padding={2}>
     <IconButton
       accessibilityLabel="Cancel"
@@ -348,7 +347,7 @@ class Product extends Component {
                   <Column span={12}>
                   <Box padding={2}>
                   <ProductDescriptionImage variantImage={variantImage} bioDescription={bioDescription} product={this.props.product} variant={variant} />
-                    {this.props.product.images.edges.length ? <img onLoad={this.props.handleImageLoaded} src={variantImage} style={{'maxHeight': '450px', 'paddingTop': '50px'}} alt={`${this.props.product.title} product shot`}/> : null}
+                    {this.props.product.images.edges.length ? <img src={variantImage} style={{'maxHeight': '450px', 'paddingTop': '50px'}} alt={`${this.props.product.title} product shot`}/> : null}
                     <div className={'mobileOptions'}>
                     <ProductOptions handleQuantityChange={this.handleQuantityChange} selectedVariantQuantity={this.state.selectedVariantQuantity} variant_selectors={variant_selectors} />
                     <label className="Product__option">
@@ -382,7 +381,7 @@ class Product extends Component {
                  <TextField
                     id="quantity"
                     min="1"
-                    onChange={(value) => this.props.handleQuantityChange(value)}
+                    onChange={(value) => this.handleQuantityChange(value)}
                     placeholder="Quantity"
                     value={this.props.selectedVariantQuantity}
                     type={"number"}

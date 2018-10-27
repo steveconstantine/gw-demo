@@ -25,6 +25,7 @@ body {
   overflow-y: hidden;
   height: 100vh;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 
 html {
@@ -33,6 +34,7 @@ html {
 
 body ::-webkit-scrollbar {
     -webkit-appearance: none;
+    display: none;
     width: 2px !important;
     height: 10px;
 }
@@ -405,11 +407,11 @@ bottom: 75px;
   font-weight: bold;
   font-size: 20px;
   line-height: 25px;
-  color: #767676;
+  color: #000;
 }
 
 .Line-item__title {
-  color: #4E5665;
+  color: #000;
   font-size: 22px;
   font-weight: 400;
 }
@@ -651,7 +653,11 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 
 [type=reset], [type=submit], button, html [type=button] {
     -webkit-appearance: button;
-    opacity: 0.8;
+    opacity: 1 !important;
+}
+
+.cartButton {
+  padding-right: 10px;
 }
 
 .CustomerAuth--open {
@@ -837,10 +843,15 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
   justify-content: center;
   align-items: center;
   align-self: center;
-  height: 100vh;
+  height: 200vh;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: cover !important;
   transition: background-image 0.4s ease-in-out;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
 }
 .custom-modal {
   width: 400px;

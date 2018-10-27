@@ -2,13 +2,22 @@ import { ApolloClient } from 'apollo-client';
 import { createHttpLink } from 'apollo-link-http';
 import { setContext } from 'apollo-link-context';
 import { InMemoryCache } from 'apollo-cache-inmemory';
-import fetch from 'node-fetch';
+import { persistCache } from 'apollo-cache-persist';
+import fetch from 'isomorphic-fetch';
+
+if (!process.browser) {
+  global.fetch = fetch
+}
 
 var localStorage = require('web-storage')().localStorage;
 
 export function createApolloClient() {
   const ssrMode = !process.browser;
   const httpLink = createHttpLink({ uri: 'https://giftingwildinc.myshopify.com/api/graphql', fetch: fetch })
+
+  const cache = new InMemoryCache();
+
+  var localStorage = require('web-storage')().localStorage;
 
   const token = localStorage.get('token');
 
@@ -23,7 +32,7 @@ export function createApolloClient() {
     ssrMode,
     link: middlewareLink.concat(httpLink),
     cache: ssrMode
-      ? new InMemoryCache()
-      : new InMemoryCache().restore(window.__APOLLO_STATE__),
+      ? cache
+      : cache.restore(window.__APOLLO_STATE__),
   });
 }

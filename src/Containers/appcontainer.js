@@ -1,6 +1,6 @@
 import React from 'react';
 import Home from '../App';
-import { ModalContainer } from 'sc-react-router-modal';
+import { ModalContainer } from 'gw-react-router-modal';
 
 class AppContainer extends React.Component {
     render() {

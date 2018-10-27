@@ -176,7 +176,7 @@ class Cart extends Component {
      >
         <div style={{ 'display': 'inline-grid', 'marginLeft': '0', 'minHeight': '100vh'}}>
         <header className="Cart__header" style={{'position': 'relative', 'width': '100vw', 'height': '100%'}}>
-          <div className="just-donate" style={{'position': 'fixed', 'right': '2px', 'top': '2px', 'zIndex': '9999'}}>
+          <div className="just-donate" style={{'position': 'fixed', 'right': '12px', 'top': '2px', 'zIndex': '9999'}}>
             <Box padding={2}>
             <IconButton
               accessibilityLabel="Cancel"
@@ -194,7 +194,7 @@ height={375}
 itemCount={line_items.length}
 itemSize={150}
 renderItem={({index}) =>
-  <div key={index}>
+  <div key={index} style={ index % 2 == 0 ? {'padding': '20px'} : {'background': 'white'}}>
   {line_items[index]}
   </div>
 }

@@ -2,14 +2,24 @@ import React from 'react';
 import express from 'express';
 import { renderToString } from 'react-dom/server';
 import { ApolloProvider, getDataFromTree } from 'react-apollo';
-import { createApolloClient } from './apollo';
+import { ApolloClient } from 'apollo-client';
+import { createHttpLink } from 'apollo-link-http';
+import { setContext } from 'apollo-link-context';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+import { CachePersistor } from 'apollo-cache-persist';
+import * as fetch from 'isomorphic-fetch';
 import { AppRegistry } from 'react-native';
 import { render } from '@jaredpalmer/after';
 import routes from './routes';
 import Document from './Document';
 
+if (!process.browser) {
+  global.fetch = fetch
+}
+
 var compression = require('compression');
 var minify = require('express-minify');
+var localStorage = require('web-storage')().localStorage;
 
 const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
 
@@ -23,13 +33,51 @@ server
   .use(express.static(process.env.RAZZLE_PUBLIC_DIR))
   .get('/*', async (req, res) => {
     const customRenderer = node => {
-      const client = createApolloClient();
+
+      const cache = new InMemoryCache();
+
+      const ssrMode = !process.browser;
+      const httpLink = createHttpLink({ uri: 'https://giftingwildinc.myshopify.com/api/graphql', fetch: fetch })
+
+      const token = localStorage.get('token');
+
+      const middlewareLink = setContext(() => ({
+        headers: {
+          'X-Shopify-Storefront-Access-Token': 'e533f252f3a673c02f85798859530319'
+        },
+        authorization: token ? `Bearer ${token}` : "",
+      }))
+
+
+      const client = new ApolloClient({
+        ssrMode,
+        link: middlewareLink.concat(httpLink),
+        cache: cache
+      });
 
       class App extends React.Component {
-        render() {
-          return <ApolloProvider client={client}>{node}</ApolloProvider>;
+
+        constructor(){
+          super();
+          this.state = { loaded: false, client: null };
         }
-      }
+
+        async componentDidMount() {
+
+          this.setState({
+            loaded: true,
+            client
+          });
+        }
+
+        render() {
+          if (!this.state.loaded) {
+           return <div></div>;
+         } else {
+           return <ApolloProvider client={client}>{node}</ApolloProvider>;
+         }
+       }
+     }
 
       return getDataFromTree(App).then(async data => {
         AppRegistry.registerComponent('App', () => App);
@@ -57,6 +105,7 @@ server
       res.send(html);
     } catch (error) {
       res.json(error);
+      console.log('server instantiation error');
       console.log(error);
     }
   });

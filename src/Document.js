@@ -13,6 +13,7 @@ export default class Document extends React.Component {
   }
   render() {
     const { helmet, assets, data, css, initialApolloState } = this.props;
+    console.log(console.log(initialApolloState));
     const htmlAttrs = helmet.htmlAttributes.toComponent();
     const bodyAttrs = helmet.bodyAttributes.toComponent();
     return (

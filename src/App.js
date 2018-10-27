@@ -24,7 +24,6 @@ import Drawer from 'rc-drawer-menu';
 // import GWInfo from './components/Info/GWInfo';
 import ModalLinkProduct from './components/Product';
 import Ionicon from 'react-ionicons';
-import Loadable from 'react-loadable';
 import Slider from "react-slick";
 import { withRouter } from "react-router-dom";
 import BackgroundImage from 'react-background-image-loader';
@@ -41,14 +40,6 @@ import './styles/app.css';
 import './styles/Scrollable.css';
 
 var localStorage = require('web-storage')().localStorage;
-
-const LoadableCustomerAuth = Loadable({
-  loader: () => import('./components/CustomerAuth'),
-  loading() {
-    return <div>Loading...</div>
-  }
-});
-
 
 class Home extends Component {
 
@@ -87,7 +78,7 @@ class Home extends Component {
       items: ['Our Story', 'Campaign'],
       isSliding: false,
       direction: false,
-      imagesLoaded: [],
+      imagesLoaded: false,
     };
 
     this.handleCartClose = this.handleCartClose.bind(this);
@@ -128,11 +119,8 @@ class Home extends Component {
         checkout: resSave
       });
     });
-    let imageCount = [];
-    for (let i = 0; i < 8; i++) {
-        imageCount.push(false);
-    }
-    this.setState({imagesLoaded: imageCount});
+
+    this.setState({imagesLoaded: true});
   }
 
   componentDidMount() {
@@ -261,24 +249,17 @@ class Home extends Component {
   }
 
   handleImageLoaded(index) {
-    let imagesLoaded = this.state.imagesLoaded;
-    imagesLoaded[index] = true;
-    this.setState({imagesLoaded: imagesLoaded });
+    this.setState({imagesLoaded: true });
   }
 
   imagesLoaded() {
     const imagesLoaded = this.state.imagesLoaded;
-    for (let i = 0; i < this.props.data.shop.products.edges.length; i++) {
-      if (imagesLoaded[i] == false) {
-        return false;
-      }
-    }
     return true;
   }
 
   render() {
-    if (this.props.data.loading || this.imagesLoaded == false) {
-      return  (<div id={'spinner'}></div>);
+    if (this.props.data.loading) {
+      return (<div id={'spinner'} style={{'background': 'url(/skye-whalesong8x32.jpg)'}}></div>);
     }
     if (this.props.data.error) {
       return <p>{this.props.data.error.message}</p>;
@@ -321,8 +302,8 @@ class Home extends Component {
       result.push(
         <ModalLinkProduct
           addVariantToCart={this.addVariantToCart}
-          client={this.props.data}
           checkout={this.state.checkout}
+          client={this.props.client}
           key={product.node.id.toString()}
           product={product.node}
           productIDs={productIDs}
@@ -331,7 +312,7 @@ class Home extends Component {
           artSize={(Math.random() + 1)}
           selectedVariant={this.selectedVariant}
           isSliding={this.state.isSliding}
-          handleImageLoaded={() => this.handleImageLoaded(index)}
+          handleImageLoaded={true}
           cartOpen={this.state.isCartOpen == true ? true : false }
         />);
       } else {
@@ -429,7 +410,7 @@ class Home extends Component {
                   <img style={{'maxWidth': '105px', 'transform' : 'translate(-20px,3px)'}} src="/Gift_W_top.png" alt="Gifting Wild" border="0" />
                 </Box>
                  <Box paddingX={2}>
-                  <div ref={d => {
+                  <div className="questionButton" ref={d => {
                       this.infoAnchor = d;
                   }}>
                     <IconButton
@@ -442,7 +423,7 @@ class Home extends Component {
                     </div>
                   </Box>
               <Box paddingX={2} paddingY={5}>
-                <div>
+                <div className="cartButton">
                   <Ionicon icon="ios-cart" fontSize="24px" color={ this.state.isCartOpen ? "#FFF" : "#FFF" } onClick={() => this.handleCartOpen() }/>
                 </div>
               </Box>
@@ -506,58 +487,52 @@ class Home extends Component {
 }
 
 const query = gql`
-  query query {
-    shop {
-      name
-      description
-      products(first:20) {
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-        }
-        edges {
-          node {
+query shopQuery {
+  shop {
+    name
+    products(first:15) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }
+      edges {
+        node {
+          id
+          title
+          vendor
+          handle
+          productType
+          descriptionHtml
+          options {
             id
-            title
-            vendor
-            handle
-            productType
-            descriptionHtml
-            options {
-              id
-              name
-              values
-            }
-            variants(first: 250) {
-              pageInfo {
-                hasNextPage
-                hasPreviousPage
-              }
-              edges {
-                node {
-                  id
-                  title
-                  selectedOptions {
-                    name
-                    value
-                  }
-                  image {
-                    src
-                  }
-                  availableForSale
-                  price
+            name
+            values
+          }
+          variants(first: 30) {
+            edges {
+              node {
+                id
+                title
+                selectedOptions {
+                  name
+                  value
                 }
-              }
-            }
-            images(first: 250) {
-              pageInfo {
-                hasNextPage
-                hasPreviousPage
-              }
-              edges {
-                node {
+                image {
                   src
                 }
+                availableForSale
+                price
+              }
+            }
+          }
+          images(first:30) {
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+            }
+            edges {
+              node {
+                src
               }
             }
           }
@@ -565,6 +540,7 @@ const query = gql`
       }
     }
   }
+}
 `;
 
 const AppWithDataAndMutation = compose(
