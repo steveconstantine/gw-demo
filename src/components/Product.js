@@ -12,7 +12,7 @@ import ProductDescriptionImage from './Product/ProductDescriptionImage';
 
 // import Info from './Info/Info';
 import { Box, Column, TextField, Toast, IconButton, Heading, Button, Image } from 'gestalt';
-import { ModalLink } from 'gw-react-router-modal';
+import { ModalLink } from 'sc-react-router-modal';
 import Swipeable from 'react-swipeable';
 import Rodal from 'sc-rodal';
 import isMobile from 'ismobilejs';
@@ -60,7 +60,6 @@ class ModalLinkProduct extends React.Component {
           path={`/art/${product.vendor.replace(" ","-").toLowerCase().toString()}-${product.title.replace(" ","-").toLowerCase().toString()}`}
           parentPath='/'
           component={Product}
-          enabled={true}
           props={{
           addVariantToCart: this.props.addVariantToCart,
           checkout: this.props.checkout,
@@ -213,7 +212,7 @@ class Product extends Component {
   render() {
     let variantImage = this.state.selectedVariantImage || this.props.product.images.edges[0].node.src
     let variant = this.state.selectedVariant || this.props.product.variants.edges[0].node
-    let variantQuantity = this.state.selectedVariantQuantity || 1
+    let variantQuantity = this.state.selectedVariantQuantity
     let variant_selectors = [];
     let text_button_variant_selectors = [];
     if (this.props.product.variants.edges[0].node.selectedOptions.length > 1) {
@@ -355,7 +354,7 @@ class Product extends Component {
                        <TextField
                           id="quantity"
                           min="1"
-                          onChange={(value) => this.props.handleQuantityChange(value)}
+                          onChange={(value) => this.handleQuantityChange(value)}
                           placeholder="Quantity"
                           value={this.props.selectedVariantQuantity}
                           type={"number"}

@@ -194,7 +194,7 @@ height={375}
 itemCount={line_items.length}
 itemSize={150}
 renderItem={({index}) =>
-  <div key={index} style={ index % 2 == 0 ? {'padding': '20px'} : {'background': 'white'}}>
+  <div key={index} style={ index % 2 == 0 ? {'padding': '20px'} : {'background': 'rgba(255, 255, 255, 0.5)', 'padding': '20px'}}>
   {line_items[index]}
   </div>
 }
