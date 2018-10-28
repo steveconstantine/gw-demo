@@ -32,7 +32,7 @@ const options = [
 class Cart extends Component {
   constructor(props) {
   super(props);
-    this.state = {order : null, orderExtra: null};
+    this.state = {order : "", orderExtra: null, donationId: this.props.donationId, donationValue: 0 };
     this.setDonation = this.setDonation.bind(this);
     this.setDonationClick = this.setDonationClick.bind(this);
   }
@@ -47,15 +47,30 @@ class Cart extends Component {
     let line_item_array = [];
     if (_.isNull(this.props.checkout) == false && _.isUndefined(this.props.checkout.lineItems) == false) {
       line_item_array = this.props.checkout.lineItems.edges.map((line_item) => {
-          return line_item.node.variant.id.toString();
+        console.log(line_item);
+        console.log(this.props.donationId);
+        return line_item.node.variant.id.toString();
         }, this);
       for (let i = 0; i < line_item_array.length; i++) {
-          if (line_item_array[i] == "Z2lkOi8vc2hvcGlmeS9Qcm9kdWN0VmFyaWFudC8xNDIyOTU1NDg1NTk5NA==") {
+          if (line_item_array[i] == this.props.donationId) {
               line_items.push(line_item_array[i]);
           }
       }
-      if (line_items.length > 0) {
-        this.props.setDonationValue(value.replace(/\./g, ""), line_items[0]);
+      if (value != 'more' && line_items.length > 0) {
+        console.log('attempting update 1st loop');
+        this.props.removeLineItemInCart(line_items[0]);
+        this.setState({
+          donationValue: value * 100,
+          donationLineItemId: line_items[0]
+        });
+        this.props.setDonationValue(value.replace(/\./g, ""), this.state.donationId);
+      } else {
+        console.log('attempting update 2nd loop');
+        this.setState({
+          donationValue: value * 100,
+          donationLineItemId: null
+        });
+      //  this.props.setDonationValue(value.replace(/\./g, ""), null);
       }
     } else {
     // do nothing
@@ -68,15 +83,30 @@ class Cart extends Component {
     let line_item_array = [];
     if (_.isNull(this.props.checkout) == false && _.isUndefined(this.props.checkout.lineItems) == false) {
       line_item_array = this.props.checkout.lineItems.edges.map((line_item) => {
+          console.log("line_item");
+          console.log(this.props.donationId);
           return line_item.node.variant.id.toString();
         }, this);
       for (let i = 0; i < line_item_array.length; i++) {
-          if (line_item_array[i] == "Z2lkOi8vc2hvcGlmeS9Qcm9kdWN0VmFyaWFudC8xNDIyOTU1NDg1NTk5NA==") {
+          if (line_item_array[i] == this.props.donationId) {
               line_items.push(line_item_array[i]);
           }
       }
       if (value != 'more' && line_items.length > 0) {
-        this.props.setDonationValue(value.replace(/\./g, ""), line_items[0]);
+        console.log('attempting update 1st loop');
+        this.props.removeLineItemInCart(line_items[0]);
+        this.setState({
+          donationValue: value * 100, // value.replace(/\./g, "")
+          donationLineItemId: line_items[0]
+        });
+
+      this.props.setDonationValue(value.replace(/\./g, ""), this.props.donationId);
+      } else {
+        console.log('attempting update 2nd loop');
+        this.setState({
+          donationValue: value * 100,
+          donationLineItemId: null
+        });
       }
     } else {
     // do nothing
@@ -84,19 +114,23 @@ class Cart extends Component {
   }
 
   render() {
+    if (_.isNull(this.props.checkout)) {
+      console.log("null checkout");
+    }
     let line_items = [];
     if (_.isNull(this.props.checkout) == false && _.isUndefined(this.props.checkout.lineItems) == false) {
     line_items = this.props.checkout.lineItems.edges.reduce((result, line_item) => {
-      result.push(<LineItem
+      if (line_item.node.variant.id.toString() != this.props.donationId) {
+          result.push(<LineItem
           removeLineItemInCart={this.props.removeLineItemInCart}
           updateLineItemInCart={this.props.updateLineItemInCart}
           key={line_item.node.id.toString()}
           line_item={line_item.node}
         />);
+      }
     return result;
   }, []);
   }
-
     let moreSelected = false;
     let finalDonation;
       if (this.state.order == 'more') {
@@ -241,7 +275,7 @@ renderItem={({index}) =>
               <span className="pricing">$ { trueCheckout == false ? finalCheckoutValue.toFixed(2) : finalDonation} </span>
             </div>
           </div>
-          <CartButton color="black" text="Checkout" onClick={() => {window.open(this.props.checkout.webUrl)}}></CartButton>
+          <CartButton color="black" text="Checkout" onClick={() => {this.props.setDonationValue(this.state.donationValue, this.state.donationId); window.open(this.props.checkout.webUrl)}}></CartButton>
         </footer>
         </div>
         </ReactModal>

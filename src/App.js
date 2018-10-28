@@ -11,6 +11,7 @@ import {
   checkoutCustomerAssociate,
   addVariantToCart,
   addDonationToCart,
+  updateDonationInCart,
   removeDonationInCart,
   updateLineItemInCart,
   removeLineItemInCart,
@@ -28,6 +29,7 @@ import Slider from "react-slick";
 import { withRouter } from "react-router-dom";
 import BackgroundImage from 'react-background-image-loader';
 import Scrollable from 'sc-hide-scrollbar-react';
+import StickyFooter from 'react-sticky-footer';
 import './styles/DonationRadioButtonGroup.css';
 import './styles/gestalt.css';
 import './styles/RadioButtonGroup.css';
@@ -88,9 +90,11 @@ class Home extends Component {
     this.closeCustomerAuthVerified = this.closeCustomerAuthVerified.bind(this);
     this.addVariantToCart = addVariantToCart.bind(this);
     this.addDonationToCart = addDonationToCart.bind(this);
+    this.updateDonationInCart = updateDonationInCart.bind(this);
     this.removeDonationInCart = removeDonationInCart.bind(this);
     this.updateLineItemInCart = updateLineItemInCart.bind(this);
     this.removeLineItemInCart = removeLineItemInCart.bind(this);
+    this.handleDonations = this.handleDonations.bind(this);
     this.showAccountVerificationMessage = this.showAccountVerificationMessage.bind(this);
     this.associateCustomerCheckout = associateCustomerCheckout.bind(this);
     this.handleClick = this._handleClick.bind(this);
@@ -124,7 +128,6 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    // do something
   }
 
   static propTypes = {
@@ -257,13 +260,30 @@ class Home extends Component {
     return true;
   }
 
+  handleDonations(donationVariantId, value, lineItemId) {
+    console.log(lineItemId);
+    if (lineItemId != null) {
+      console.log("handleDonations 1st if");
+      this.removeDonationInCart(lineItemId);
+      this.updateDonationInCart(donationVariantId, lineItemId, value);
+    } else {
+      console.log("handleDonations 2nd if");
+      this.removeDonationInCart(lineItemId);
+      this.updateDonationInCart(donationVariantId, lineItemId, value);
+    }
+  }
+
   render() {
+
     if (this.props.data.loading) {
       return (<div id={'spinner'} style={{'background': 'url(/skye-whalesong8x32.jpg)'}}></div>);
     }
     if (this.props.data.error) {
       return <p>{this.props.data.error.message}</p>;
     }
+
+      console.log("Home - render method");
+      console.log(this.state.checkout);
 
     let productIDs = this.props.data.shop.products.edges.reduce((result, product) => {
     if (product.node.handle != 'donation') {
@@ -392,13 +412,15 @@ class Home extends Component {
               >
                 <Box padding={3}>
                   <Cart
-                    setDonationValue={(value, lineItemId) => this.addDonationToCart(donationVariantId, lineItemId, value)}
+                    setDonationValue={(value, lineItemId) => { this.handleDonations(donationVariantId, value, lineItemId) }}
+                    removeDonationInCart={(lineItemId) => { this.removeDonationInCart(lineItemId)}}
                     removeLineItemInCart={this.removeLineItemInCart}
                     updateLineItemInCart={this.updateLineItemInCart}
                     checkout={this.state.checkout}
                     isCartOpen={this.state.isCartOpen && this.props.location.pathname == '/cart' ? true : false}
                     handleCartClose={this.handleCartClose}
                     customerAccessToken={this.state.customerAccessToken}
+                    donationId={donationVariantId}
                   />
                 </Box>
               </Drawer>
@@ -447,40 +469,54 @@ class Home extends Component {
               { this.state.isCartOpen == false ? <Button color="transparent" text="Donate Extra" size="lg" onClick={this.handleCartOpen}/> : null }
             </Box>
           </div>
-          <Box>
-          <div style={{'position': 'fixed', 'bottom': '15px', 'right': '15px', 'borderRadius': '45px'}}
-            ref={c => {
-              this.anchortool = c;
-            }}
-          >
-            {this.state.opentool == false ?
-              <button className="copyright-button" onClick={this.handleClickTooltip}>©</button>
-              :
-              <IconButton
-                accessibilityLabel="Close Copyright Information"
-                icon="cancel"
-                size="md"
-                iconColor="white"
-                onClick={() => this.setState({opentool: false})}
-              />
-            }
-          </div>
-            {this.state.opentool && (
-              <div className="tooltip_container" style={{'position': 'fixed', 'bottom': '100px', 'right': '440px', 'borderRadius': '45px'}}>
-              <Tooltip
-                size="xl"
-                anchor={this.anchortool}
-                idealDirection="left"
-                onDismiss={this.handleDismissTooltip}
-              >
-                <Text bold color="white" size="md">
-                  Copyright © 2018 - Gifting Wild Inc. Art and Their Prints Are Trademark / Registered / Copyright of Respective Artist(s).
-                </Text>
-              </Tooltip>
-              </div>
-            )}
-          </Box>
         </div>
+        <StickyFooter
+    bottomThreshold={50}
+    normalStyles={{
+    backgroundColor: "#d3d9e054",
+    padding: "0.1rem 2rem 0.1em 100vw",
+    }}
+    stickyStyles={{
+    backgroundColor: "#d3d9e054",
+    padding: "0.1rem 2rem 0.1em 100%",
+    position: "fixed",
+    bottom: "0",
+    right: "0",
+    }}
+>        <Box>
+        <div className="sticky-footer"
+          ref={c => {
+            this.anchortool = c;
+          }}
+        >
+          {this.state.opentool == false ?
+            <button className="copyright-button" onClick={this.handleClickTooltip}>©</button>
+            :
+            <IconButton
+              accessibilityLabel="Close Copyright Information"
+              icon="cancel"
+              size="sm"
+              iconColor="white"
+              onClick={() => this.setState({opentool: false})}
+            />
+          }
+        </div>
+          {this.state.opentool && (
+            <div>
+            <Tooltip
+              size="xl"
+              anchor={this.anchortool}
+              idealDirection="left"
+              onDismiss={this.handleDismissTooltip}
+            >
+              <Text bold color="white" size="md">
+                Copyright © 2018 - Gifting Wild Inc. Art and Their Prints Are Trademark / Registered / Copyright of Respective Artist(s).
+              </Text>
+            </Tooltip>
+            </div>
+          )}
+        </Box>
+        </StickyFooter>
       </Scrollable>
     );
   }

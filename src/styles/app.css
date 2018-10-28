@@ -1,6 +1,30 @@
 /* INITIALIZERS + DEFAULTS
  * ============================== */
 
+ /*WIDE SCREEN SUPPORT*/
+ @media screen and (min-width: 769px) {
+     #App {
+         background-size: cover;
+         background-repeat: no-repeat;
+         width: 100%;
+         height: 0;
+         padding-top: 400%; /* (img-height / img-width * container-width) */
+                     /* (4000 / 100 * 100) */
+     }
+ }
+
+ /*MOBILE SUPPORT*/
+ @media screen and (max-width: 768px) {
+     #App {
+         background-size: contain;
+         background-repeat: no-repeat;
+         width: 100%;
+         height: 0;
+         padding-top: 400%; /* (img-height / img-width * container-width) */
+                     /* (853 / 1280 * 100) */
+     }
+ }
+
 *, *:before, *:after {
   box-sizing: border-box;
 }
@@ -1094,8 +1118,18 @@ footer {
   color: white !important;
   background: transparent !important;
   border: none !important;
-  font-size: 34px;
+  font-size: 26px;
   font-weight: bold;
+}
+
+#App + div {
+  position: fixed !important;
+  bottom: 0 !important;
+  right: 0 !important;
+}
+
+.sticky-footer {
+
 }
 
 

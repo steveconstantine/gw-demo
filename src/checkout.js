@@ -105,7 +105,7 @@ export const checkoutCustomerAssociate = gql`
   ${CheckoutFragment}
 `;
 
-export function addVariantToCart(variantId, quantity){
+export function addVariantToCart(variantId, quantity) {
   this.props.checkoutLineItemsAdd(
     { variables: { checkoutId: this.state.checkout.id, lineItems:  [{variantId, quantity: parseInt(quantity, 10)}] }
     }).then((res) => {
@@ -122,23 +122,40 @@ export function addVariantToCart(variantId, quantity){
   this.handleCartOpen();
 }
 
-export function addDonationToCart(variantId, lineItemId, quantity){
+export function updateDonationInCart(variantId, lineItemId, quantity) {
+  console.log("updating donation");
   this.props.checkoutLineItemsAdd(
     { variables: { checkoutId: this.state.checkout.id, lineItems:  [{variantId, quantity: parseInt(quantity * 100, 10)}] }
     }).then((res) => {
-    this.removeDonationInCart(lineItemId);
-    localStorage.set('checkout', JSON.stringify(res.data.checkoutLineItemsAdd.checkout));
-    this.setState({
-      checkout: res.data.checkoutLineItemsAdd.checkout
-    });
-    // console.log(this.state.checkout);
-  });
+    if (lineItemId != null) {
+      localStorage.set('checkout', JSON.stringify(res.data.checkoutLineItemsAdd.checkout));
+      this.setState({
+        checkout: res.data.checkoutLineItemsAdd.checkout
+      });
+    }
+  }, this);
 }
 
-export function removeDonationInCart(lineItemId){
-  this.props.checkoutLineItemsUpdate(
-    { variables: { checkoutId: this.state.checkout.id, lineItems: [{id: lineItemId, quantity: 0}] }
+export function addDonationToCart(variantId, quantity) {
+  console.log("adding donation");
+  console.log(variantId);
+    this.props.checkoutLineItemsAdd(
+      { variables: { checkoutId: this.state.checkout.id, lineItems:  [{variantId, quantity: parseInt(quantity, 10)}] }
+      }).then((res) => {
+      localStorage.set('checkout', JSON.stringify(res.data.checkoutLineItemsUpdate.checkout));
+      this.setState({
+        checkout: res.data.checkoutLineItemsUpdate.checkout
+      });
+    });
+}
+
+export function removeDonationInCart(lineItemId) {
+  console.log("removing donation");
+  console.log(lineItemId);
+  this.props.checkoutLineItemsRemove(
+    { variables: { checkoutId: this.state.checkout.id, lineItems: [lineItemId] }
     }).then((res) => {
+    console.log(res);
     localStorage.set('checkout', JSON.stringify(res.data.checkoutLineItemsUpdate.checkout));
     this.setState({
       checkout: res.data.checkoutLineItemsUpdate.checkout
@@ -146,7 +163,7 @@ export function removeDonationInCart(lineItemId){
   });
 }
 
-export function updateLineItemInCart(lineItemId, quantity){
+export function updateLineItemInCart(lineItemId, quantity) {
   this.props.checkoutLineItemsUpdate(
     { variables: { checkoutId: this.state.checkout.id, lineItems: [{id: lineItemId, quantity: parseInt(quantity, 10)}] }
     }).then((res) => {
@@ -157,7 +174,7 @@ export function updateLineItemInCart(lineItemId, quantity){
   });
 }
 
-export function removeLineItemInCart(lineItemId){
+export function removeLineItemInCart(lineItemId) {
   this.props.checkoutLineItemsRemove(
     { variables: { checkoutId: this.state.checkout.id, lineItemIds: [lineItemId] }
     }).then((res) => {
@@ -168,7 +185,7 @@ export function removeLineItemInCart(lineItemId){
   });
 }
 
-export function associateCustomerCheckout(customerAccessToken){
+export function associateCustomerCheckout(customerAccessToken) {
   this.props.checkoutCustomerAssociate(
     { variables: { checkoutId: this.state.checkout.id, customerAccessToken: customerAccessToken }
     }).then((res) => {
