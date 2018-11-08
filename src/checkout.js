@@ -105,21 +105,33 @@ export const checkoutCustomerAssociate = gql`
   ${CheckoutFragment}
 `;
 
+const query = gql`
+  query checkoutFunctionsQuery {
+  lineItems @client
+  checkoutId @client
+}
+`;
+
+
 export function addVariantToCart(variantId, quantity) {
   this.props.checkoutLineItemsAdd(
-    { variables: { checkoutId: this.state.checkout.id, lineItems:  [{variantId, quantity: parseInt(quantity, 10)}] }
+    { variables: { checkoutId: null, lineItems:  [{variantId, quantity: parseInt(quantity, 10)}] }
     }).then((res) => {
+      console.log('res');
+      console.log(res);
     if (_.isNull(variantId) || _.isUndefined(variantId)) {
-          // toast message
+          console.log('null / undefined variantId');
     } else {
-    localStorage.set('checkout', JSON.stringify(res.data.checkoutLineItemsAdd.checkout));
-    this.setState({
-      checkout: res.data.checkoutLineItemsAdd.checkout
-    });
+      console.log('res.id');
+      console.log(res.data.checkoutLineItemsAdd.checkout.lineItems);
+      this.setState({ checkoutId: res.data.checkoutLineItemsAdd.checkout.id })
+      this.props.client.writeData({ data: { isCartModalOpen: true, checkoutId: res.data.checkoutLineItemsAdd.checkout.id } });
     }
+  }, this).catch((e) => {
+    console.log('addVariantToCart error');
+    console.log(e);
   });
-
-  this.handleCartOpen();
+  this.props.history.push('/cart');
 }
 
 export function updateDonationInCart(variantId, lineItemId, quantity) {
@@ -128,10 +140,9 @@ export function updateDonationInCart(variantId, lineItemId, quantity) {
     { variables: { checkoutId: this.state.checkout.id, lineItems:  [{variantId, quantity: parseInt(quantity * 100, 10)}] }
     }).then((res) => {
     if (lineItemId != null) {
-      localStorage.set('checkout', JSON.stringify(res.data.checkoutLineItemsAdd.checkout));
-      this.setState({
-        checkout: res.data.checkoutLineItemsAdd.checkout
-      });
+      this.setState({ checkoutId: res.id });
+      this.props.client.writeData({ data: { isCartModalOpen: true, checkoutId: res.id } });
+
     }
   }, this);
 }
@@ -140,13 +151,10 @@ export function addDonationToCart(variantId, quantity) {
   console.log("adding donation");
   console.log(variantId);
     this.props.checkoutLineItemsAdd(
-      { variables: { checkoutId: this.state.checkout.id, lineItems:  [{variantId, quantity: parseInt(quantity, 10)}] }
+      { variables: { checkoutId: this.props.data.checkout.id, lineItems:  [{variantId, quantity: parseInt(quantity, 10)}] }
       }).then((res) => {
-      localStorage.set('checkout', JSON.stringify(res.data.checkoutLineItemsUpdate.checkout));
-      this.setState({
-        checkout: res.data.checkoutLineItemsUpdate.checkout
+      this.props.client.writeData({ data: { isCartModalOpen: true } });
       });
-    });
 }
 
 export function removeDonationInCart(lineItemId) {
@@ -155,45 +163,35 @@ export function removeDonationInCart(lineItemId) {
   this.props.checkoutLineItemsRemove(
     { variables: { checkoutId: this.state.checkout.id, lineItems: [lineItemId] }
     }).then((res) => {
+    console.log('remove donation in cart res');
     console.log(res);
-    localStorage.set('checkout', JSON.stringify(res.data.checkoutLineItemsUpdate.checkout));
-    this.setState({
-      checkout: res.data.checkoutLineItemsUpdate.checkout
-    });
+    this.props.client.writeData({ data: { isCartModalOpen: true } });
   });
 }
 
 export function updateLineItemInCart(lineItemId, quantity) {
+  var checkout = this.props.client.readQuery({ query: query });
   this.props.checkoutLineItemsUpdate(
-    { variables: { checkoutId: this.state.checkout.id, lineItems: [{id: lineItemId, quantity: parseInt(quantity, 10)}] }
+    { variables: { checkoutId: checkout.checkoutId, lineItems: [{id: lineItemId, quantity: parseInt(quantity, 10)}] }
     }).then((res) => {
-    localStorage.set('checkout', JSON.stringify(res.data.checkoutLineItemsUpdate.checkout));
-    this.setState({
-      checkout: res.data.checkoutLineItemsUpdate.checkout
-    });
+      console.log(res);
+      this.props.client.writeData({ data: { isCartModalOpen: true }, lineItems: res.data.checkoutLineItemsAdd.checkout.lineItems.edges.node });
   });
 }
 
 export function removeLineItemInCart(lineItemId) {
+  var checkout = this.props.client.readQuery({ query: query });
   this.props.checkoutLineItemsRemove(
-    { variables: { checkoutId: this.state.checkout.id, lineItemIds: [lineItemId] }
+    { variables: { checkoutId: checkout.checkoutId, lineItemIds: [lineItemId] }
     }).then((res) => {
-    localStorage.set('checkout', JSON.stringify(res.data.checkoutLineItemsRemove.checkout));
-    this.setState({
-      checkout: res.data.checkoutLineItemsRemove.checkout
-    });
+    this.props.client.writeData({ data: { isCartModalOpen: true }, lineItems: res.data.checkoutLineItemsAdd.checkout.lineItems.edges.node });
   });
 }
 
 export function associateCustomerCheckout(customerAccessToken) {
   this.props.checkoutCustomerAssociate(
-    { variables: { checkoutId: this.state.checkout.id, customerAccessToken: customerAccessToken }
+    { variables: { checkoutId: this.props.data.checkout.id, customerAccessToken: customerAccessToken }
     }).then((res) => {
-    localStorage.set('checkout', JSON.stringify(res.data.checkoutCustomerAssociate.checkout));
-    this.setState({
-      checkout: res.data.checkoutCustomerAssociate.checkout,
-      isCustomerAuthOpen: false,
-      loggedIn: true,
-    });
+      this.props.client.writeData({ data: { isCartModalOpen: true} });
   });
 }

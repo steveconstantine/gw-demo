@@ -1,11 +1,16 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import { graphql, compose } from 'react-apollo';
+import { withRouter } from "react-router-dom";
 import LineItem from './LineItem';
-import { Button as CartButton, TextField, Box, Layer, IconButton } from 'gestalt';
+import { Button as CartButton, Text, TextField, Box, Layer, IconButton, Tooltip } from 'gestalt';
 import DonationRadioButtonGroup from './RadioButtonGroup/DonationRadioButtonGroup';
 import _ from 'underscore';
 import isMobile from 'ismobilejs';
 import ReactModal from 'react-modal';
+import StickyFooter from 'react-sticky-footer';
 import VirtualList from 'react-tiny-virtual-list';
+import gql from 'graphql-tag';
 
 const options = [
   {
@@ -35,6 +40,13 @@ class Cart extends Component {
     this.state = {order : "", orderExtra: null, donationId: this.props.donationId, donationValue: 0 };
     this.setDonation = this.setDonation.bind(this);
     this.setDonationClick = this.setDonationClick.bind(this);
+    this.handleCartClose = this.handleCartClose.bind(this);
+    this.setDonationClick.bind(this);
+  }
+
+  componentDidMount() {
+    console.log('cart this.props.data');
+    console.log(this.props.data);
   }
 
   setDonation(event) {
@@ -45,9 +57,8 @@ class Cart extends Component {
     this.setState({orderExtra: value});
     let line_items = [];
     let line_item_array = [];
-    if (_.isNull(this.props.checkout) == false && _.isUndefined(this.props.checkout.lineItems) == false) {
-      line_item_array = this.props.checkout.lineItems.edges.map((line_item) => {
-        console.log(line_item);
+    if (this.props.lineIems && this.props.lineItems != [] && this.props.lineItems != '[]') {
+      line_item_array = this.props.lineItems.edges.map((line_item) => {
         console.log(this.props.donationId);
         return line_item.node.variant.id.toString();
         }, this);
@@ -56,6 +67,9 @@ class Cart extends Component {
               line_items.push(line_item_array[i]);
           }
       }
+
+      console.log('line_item_array');
+      console.log(line_items);
       if (value != 'more' && line_items.length > 0) {
         console.log('attempting update 1st loop');
         this.props.removeLineItemInCart(line_items[0]);
@@ -81,9 +95,8 @@ class Cart extends Component {
     this.setState({order: value, orderExtra: null });
     let line_items = [];
     let line_item_array = [];
-    if (_.isNull(this.props.checkout) == false && _.isUndefined(this.props.checkout.lineItems) == false) {
-      line_item_array = this.props.checkout.lineItems.edges.map((line_item) => {
-          console.log("line_item");
+    if (this.props.lineIems) {
+      line_item_array = this.props.lineItems.edges.map((line_item) => {
           console.log(this.props.donationId);
           return line_item.node.variant.id.toString();
         }, this);
@@ -113,13 +126,16 @@ class Cart extends Component {
     }
   }
 
+  handleCartClose() {
+    this.props.history.push('/');
+  }
+
   render() {
-    if (_.isNull(this.props.checkout)) {
-      console.log("null checkout");
-    }
+    console.log('cart checkout infos');
+    console.log(this.props.data);
+
     let line_items = [];
-    if (_.isNull(this.props.checkout) == false && _.isUndefined(this.props.checkout.lineItems) == false) {
-    line_items = this.props.checkout.lineItems.edges.reduce((result, line_item) => {
+    line_items = this.props.lineItems.edges.reduce((result, line_item) => {
       if (line_item.node.variant.id.toString() != this.props.donationId) {
           result.push(<LineItem
           removeLineItemInCart={this.props.removeLineItemInCart}
@@ -130,7 +146,7 @@ class Cart extends Component {
       }
     return result;
   }, []);
-  }
+
     let moreSelected = false;
     let finalDonation;
       if (this.state.order == 'more') {
@@ -151,10 +167,10 @@ class Cart extends Component {
       if (finalDonation == null || finalDonation == 'NaN') {
         finalDonation = parseFloat(0).toFixed(2);
       }
-      let trueCheckout = _.isNull(this.props.checkout);
+      let trueCheckout = !this.props.data.checkout;
       let finalCheckoutValue = parseFloat(finalDonation, 10).toFixed(2);
-      if (_.isNull(this.props.checkout) == false) {
-       finalCheckoutValue = parseFloat(this.props.checkout.totalPrice,10) + parseFloat(finalDonation, 10);
+      if (this.props.data.checkout && this.props.data.checkout.totalPrice) {
+       finalCheckoutValue = parseFloat(this.props.data.checkout.totalPrice,10) + parseFloat(finalDonation, 10);
      }
 
      if (line_items.length < 1) {
@@ -167,7 +183,7 @@ class Cart extends Component {
                               padding: '0 50px !important'
                             },
                           }}
-                          size="lg" color="transparent" text="Add Items To Cart" onClick={this.props.handleCartClose}></CartButton>
+                          size="lg" color="transparent" text="Add Items To Cart" onClick={this.handleCartClose}></CartButton>
                        </Box>
                  </div>);
      }
@@ -177,7 +193,7 @@ class Cart extends Component {
       { this.props.isCartOpen && (
         <ReactModal
      isOpen={true}
-     onRequestClose={this.props.handleCartClose}
+     onRequestClose={this.handleCartClose}
      closeTimeoutMS={50}
      style={{ overlay: {}, content: {          background: `rgba(255,255,255,0.4)`,
            height: '100vh',
@@ -210,21 +226,22 @@ class Cart extends Component {
      >
         <div style={{ 'display': 'inline-grid', 'marginLeft': '0', 'minHeight': '100vh'}}>
         <header className="Cart__header" style={{'position': 'relative', 'width': '100vw', 'height': '100%'}}>
-          <div className="just-donate" style={{'position': 'fixed', 'right': '12px', 'top': '2px', 'zIndex': '9999'}}>
+          <div className="just-donate" style={{'position': 'fixed', 'right': '12px', 'top': '9px', 'zIndex': '9999'}}>
             <Box padding={2}>
             <IconButton
               accessibilityLabel="Cancel"
               bgColor="white"
               icon="cancel"
               iconColor="darkGray"
-              onClick={this.props.handleCartClose}
+              onClick={this.handleCartClose}
             />
             </Box>
           </div>
         </header>
         <VirtualList
 width='100%'
-height={375}
+height={440}
+marginTop={30}
 itemCount={line_items.length}
 itemSize={150}
 renderItem={({index}) =>
@@ -235,7 +252,7 @@ renderItem={({index}) =>
 />
         <div className="Cart__donations" style={{'position': 'sticky', 'width': '100vw',  }}>
               <p className="donations donationsMobile" style={{'position': 'relative', 'width': '100vw'}}>Donate Extra</p>
-              <DonationRadioButtonGroup items={options} value={moreSelected == 'true' ? 'moreSelected' : this.state.order}
+              <DonationRadioButtonGroup items={options} value={moreSelected == true ? 'moreSelected' : this.state.order}
                                 type="default" onClick={this.setDonationClick}/>
         </div>
           { moreSelected == true  ?
@@ -254,7 +271,7 @@ renderItem={({index}) =>
           <div className="Cart-info clearfix">
             <div className="Cart-info__total Cart-info__small">Subtotal</div>
             <div className="Cart-info__pricing">
-              <span className="pricing">$ {trueCheckout == false ? this.props.checkout.subtotalPrice : finalDonation}</span>
+              <span className="pricing">$ {trueCheckout == false ? this.props.data.checkout.subtotalPrice : finalDonation}</span>
             </div>
           </div>
           <div className="Cart-info clearfix">
@@ -266,16 +283,16 @@ renderItem={({index}) =>
           <div className="Cart-info clearfix">
             <div className="Cart-info__total Cart-info__small">Taxes</div>
             <div className="Cart-info__pricing">
-              <span className="pricing">$ {trueCheckout == false ? this.props.checkout.totalTax : 0.00}</span>
+              <span className="pricing">$ {trueCheckout == false ? this.props.data.checkout.totalTax : 0.00}</span>
             </div>
           </div>
           <div className="Cart-info clearfix">
             <div className="Cart-info__total Cart-info__small">Total</div>
             <div className="Cart-info__pricing">
-              <span className="pricing">$ { trueCheckout == false ? finalCheckoutValue.toFixed(2) : finalDonation} </span>
+              <span className="pricing">$ { trueCheckout == false ? "Error" : finalDonation} </span>
             </div>
           </div>
-          <CartButton color="black" text="Checkout" onClick={() => {this.props.setDonationValue(this.state.donationValue, this.state.donationId); window.open(this.props.checkout.webUrl)}}></CartButton>
+          <CartButton color="black" text="Checkout" onClick={() => {window.open(this.props.data.node.webUrl)}}></CartButton>
         </footer>
         </div>
         </ReactModal>
@@ -284,4 +301,4 @@ renderItem={({index}) =>
     )}
 }
 
-export default Cart;
+export default withRouter(Cart);

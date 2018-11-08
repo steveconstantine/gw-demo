@@ -1,10 +1,22 @@
 import React from 'react';
 import { asyncComponent } from '@jaredpalmer/after';
-import AppContainer from './Containers/appcontainer';
+import AppSuperContainerApollo from './Containers/appsupercontainer';
+import CartSuperContainerApollo from './Containers/cartsupercontainer';
+import ProductContainerApollo from './Containers/productcontainer';
 
 export default [
   {
-    path: '/',
-    component: AppContainer,
+    path: '/art/:id',
+    exact: true,
+    component: ProductContainerApollo,
   },
+  {
+    path: '/cart',
+    exact: true,
+    component: CartSuperContainerApollo,
+  },
+  {
+    path: '/',
+    component: AppSuperContainerApollo,
+  }
 ];

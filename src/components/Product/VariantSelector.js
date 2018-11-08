@@ -27,17 +27,18 @@ class VariantSelector extends Component {
           )
     });
     this.setState({variantValues: vV});
-    this.props.handleOptionChange(null, this.props.option.name);
+    this.props.handleOptionChange(vV[0], this.props.option.name, this.props.index);
   }
 
   render() {
-    let variantValues = this.state.variantValues;
-    // console.log(variantValues);
+
+    let { variantValues, order } = this.state;
+    let { option_index, option, option_name } = this.props;
 
     return (
       <div>
        <span className="Variant_Name" style={{ 'color': 'black', 'textAlign': 'center', 'opacity': '1'}}><Heading color="darkGray" size="xs">{this.props.option.name}</Heading></span>
-                <RadioButtonGroup items={variantValues} value={this.state.order} onClick={(value) => {this.setState({order: value}); this.props.handleOptionChange(value, this.props.option.name)}}
+                <RadioButtonGroup items={variantValues} option_index={option_index} option_name={option_name} value={order} onClick={ (value, option_name, option_index) => {this.setState({order: value}); this.props.handleOptionChange(value, option_name, option_index) }}
                                   type="default"/>
       </div>
     );

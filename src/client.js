@@ -5,18 +5,13 @@ import { AppRegistry } from 'react-native-web';
 import { ApolloProvider } from 'react-apollo';
 import { ApolloClient } from 'apollo-client';
 import { createHttpLink } from 'apollo-link-http';
-import { setContext } from 'apollo-link-context';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { persistCache } from 'apollo-cache-persist';
 import * as fetch from 'isomorphic-fetch';
 import routes from './routes';
-
-if (!process.browser) {
-  global.fetch = fetch
-}
+import initApollo from './apollo';
 
 var localStorage = require('web-storage')().localStorage;
-
 
 class App extends React.Component {
 
@@ -25,26 +20,38 @@ class App extends React.Component {
     this.state = { client: null, loaded: false};
   }
 
-  async componentDidMount() {
-    const cache = new InMemoryCache();
 
-    const ssrMode = !process.browser;
-    const httpLink = createHttpLink({ uri: 'https://giftingwildinc.myshopify.com/api/graphql', fetch: fetch })
 
-    const token = localStorage.get('token');
+    async componentDidMount() {
 
-    const middlewareLink = setContext(() => ({
-      headers: {
-        'X-Shopify-Storefront-Access-Token': 'e533f252f3a673c02f85798859530319'
-      },
-      authorization: token ? `Bearer ${token}` : "",
-    }))
 
-    const client = new ApolloClient({
-      ssrMode,
-      link: middlewareLink.concat(httpLink),
-      cache: cache.restore(window.__APOLLO_STATE__),
-    });
+
+      const initialState = { cartDisabled: false,
+                             checkoutCreated: false,
+                             checkoutId: null,
+                             donationId: '',
+                             donationVariantId : '',
+                             isProductModalOpen : false,
+                             isCartModalOpen: true,
+                             isNetworkOffline : false,
+                             lineItems: [],
+                             selectedOptions: [],
+                             selectedVariant: [],
+                             initialVariantBool: true,
+                             selectedVariantImage: '',
+                             selectedVariantQuantity: 1,
+                             whichProductOpen: ''
+                            };
+
+    const client = initApollo(initialState);
+
+/*    this.props.createCheckout({
+      variables: {
+        input: {}
+      }}).then((res) => {
+      let resSave =  res.data.checkoutCreate.checkout;
+      client.writeData({ data: { checkout: resSave } });
+    });*/
 
     this.setState({
       client,
@@ -55,11 +62,11 @@ class App extends React.Component {
 
   render() {
     if (!this.state.loaded) {
-      return <div></div>;
+      return <div id={'spinner'} style={{'background': 'url(/skye-whalesong8x32.jpg)'}}></div>;
     } else {
-    console.log(this.props.data);
-    return (
-      <ApolloProvider client={this.state.client}>
+      const { client } = this.state;
+      return (
+      <ApolloProvider client={client}>
         <BrowserRouter>
           <After data={this.props.data} routes={routes} />
         </BrowserRouter>

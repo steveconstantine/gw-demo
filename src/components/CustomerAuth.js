@@ -30,7 +30,7 @@ class CustomerAuth extends Component {
   handleInputChange(value) {
       this.setState({email: value.value});
   }
-  
+
   handleInputChangePassword(value) {
       this.setState({password : value.value});
   }

@@ -1,13 +1,12 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 
 class RadioButtonGroup extends React.Component {
-    static propTypes = {
-        items : PropTypes.array,
-        value : PropTypes.string,
-        onClick : PropTypes.func,
-        type : PropTypes.string
-    };
+
+    constructor(props) {
+      super(props);
+      this.getItemElement = this.getItemElement.bind(this);
+      this.getSelectedClassName = this.getSelectedClassName.bind(this);
+    }
 
     render() {
         const {items,type} = this.props;
@@ -21,11 +20,11 @@ class RadioButtonGroup extends React.Component {
     }
 
     getItemElement = (item) => {
-        const {value} = this.props;
+        const { value, option_index, option_name } = this.props;
         const className = value == item.value ? this.getSelectedClassName() : '';
         return (
             <a key={item.value+item.label} href="#" className={className}
-               onClick={this.onClick(item.value).bind(this)}>{item.label}</a>
+               onClick={() => this.props.onClick(item.value, option_name, option_index)}>{item.label}</a>
         );
     };
 
@@ -37,12 +36,6 @@ class RadioButtonGroup extends React.Component {
             case 'secondary' :
                 return ' secondaryButtonSelected';
         }
-    }
-
-    onClick(value) {
-        return function () {
-            this.props.onClick(value);
-        };
     }
 }
 

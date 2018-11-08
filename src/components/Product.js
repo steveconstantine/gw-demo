@@ -9,416 +9,438 @@ import SingleVariantSelector from './Product/SingleVariantSelector';
 import ProductSocial from './Product/ProductSocial';
 import ProductOptions from './Product/ProductOptions';
 import ProductDescriptionImage from './Product/ProductDescriptionImage';
+import ProductAdd from './ProductAdd';
+import { graphql, compose, withApollo } from 'react-apollo';
+import { Query } from "react-apollo";
 
 // import Info from './Info/Info';
 import { Box, Column, TextField, Toast, IconButton, Heading, Button, Image } from 'gestalt';
-import { ModalLink } from 'sc-react-router-modal';
 import Swipeable from 'react-swipeable';
 import Rodal from 'sc-rodal';
 import isMobile from 'ismobilejs';
 import ReactModal from 'react-modal';
 import _ from 'underscore';
 import BackgroundImage from 'react-background-image-loader';
+import gql from 'graphql-tag';
+import { withRouter } from "react-router-dom";
 
 ReactModal.setAppElement('#root');
 
+const Product = ({ history, url, match, cartDisabled, addVariantToCart }) => (
+      <Query query={ query } variables={{ id: match.params.id }}>
+        {({ loading, error, data, client }) => {
 
-class ModalLinkProduct extends React.Component {
-  state = { show: false }
 
-  render() {
-      let product = this.props.product;
-    let variantImage = this.state.selectedVariantImage || this.props.product.images.edges[0].node.src
-      const styles = {
-        homeBackground: {
+          if (loading) {
+            return (<div id={'spinner'} style={{'background': 'url(/skye-whalesong8x32.jpg)'}}></div>);
+          }
+
+          if (error) {
+            return <p>{error.message}</p>;
+          }
+
+          // console.log(data.node);
+
+          if (data) {
+          const product = data.node;
+          const initialVariant = data.node.variants.edges[0];
+
+          const findImage = (images, variantId) => {
+            const primary = images[0];
+
+            const image = images.filter(function (image) {
+              return image.variant_ids.includes(variantId);
+            })[0];
+
+            return (image || primary).src;
+          };
+
+          const handleOptionChange = (event, option_name, index) => {
+
+            let selectedNew = {};
+            let variantCheck = data.initialVariantBool;
+            console.log('check for length');
+            console.log(data.selectedVariant);
+            console.log(data.selectedVariant.length);
+            if (data.selectedVariant.length === product.options.length && product.options.length > 0) {
+                variantCheck = false;
+                console.log('variantCheckout false? ' + variantCheck);
+            }
+
+            if (variantCheck == true) {
+              selectedNew = initialVariant;
+            } else {
+              selectedNew = data.selectedVariant;
+            }
+
+
+            // write query to set all 3 defaults or 2 defaults or default and then select from there.
+
+            selectedNew[option_name] = event;
+
+             if (event !== null && _.isUndefined(product.variants.edges.find((variant) => {
+              return  variant.node.selectedOptions.every((selectedOption) => {
+                return selectedNew.node.selectedOptions[selectedOption.name] === selectedOption.value;
+              });
+            })) == false) {
+
+            const selectedVariantLoop = product.variants.edges.find((variant) => {
+              return  variant.node.selectedOptions.every((selectedOption) => {
+                return selectedNew.node.selectedOptions[selectedOption.name] === selectedOption.value;
+              });
+            });
+
+            console.log(selectedVariantLoop);
+            console.log('selectedVariantLoop ^^^');
+            console.log('ProductVariant:' + selectedVariantLoop.node.id);
+            let selectedOptions = selectedVariantLoop.node.selectedOptions;
+           let query = client.readQuery({query: variantQuery, variables: { selectedOptions: selectedOptions } })
+            if (variantCheck == false) {
+              client.writeData({ data: { cartDisabled: false, selectedVariant: selectedVariantLoop }})
+            } else {
+              client.writeData({ data: { cartDisabled: false, selectedVariant: initialVariant }})
+            }
+          } else {
+              client.writeData({ data: { cartDisabled: false } })
+          }
+
+          };
+
+          const handleQuantityChange = (event) => {
+            let value = event.value;
+            if (value < 1) {
+              value = 1;
+            }
+            client.writeData({ data: { selectedVariantQuantity: value } })
+          }
+
+          const handleModalClose = () => {
+            console.log('handle modal close');
+            client.writeData({ data: { isProductModalOpen: false, initialVariantBool: true } })
+            history.push('/');
+          }
+
+          const handleModalCloseHash = () => {
+            console.log('handle modal close hash');
+            client.writeData({ data: { isProductModalOpen: false, initialVariantBool: true } })
+            history.push('/cart');
+          }
+
+          const goPreviousProduct = () => {
+          /*  client.writeData({ data: { isProductModalOpen: true } })
+            let currentIndex = this.props.productIndex;
+            if (currentIndex === 0) {
+              currentIndex = this.props.productIDs.length;
+            }
+            history.push('/art/' + this.props.productIDs[currentIndex - 1]);*/
+          }
+
+          const goNextProduct = () => {
+            /*
+            client.writeData({ data: { isProductModalOpen: true } })
+            let currentIndex = this.props.productIndex;
+            if (currentIndex === this.props.productIDs.length - 1) {
+              currentIndex = -1;
+            }
+            history.push('/art/' + this.props.productIDs[currentIndex + 1]);*/
+          }
+
+          let variant;
+
+          if (data.initialVariantBool == true) {
+            variant = data.node.variants.edges[0];
+          } else {
+            variant = data.selectedVariant;
+          }
+
+          console.log('** variant **');
+          console.log(variant);
+          let variantImage = variant.node.image.src;
+
+          console.log('variant var');
+          console.log(variant);
+          let variantQuantity = data.selectedVariantQuantity || 1;
+          let variant_selectors = [];
+          let text_button_variant_selectors = [];
+          if (product.variants.edges[0].node.selectedOptions.length > 1) {
+          variant_selectors = product.options.map((option, index) => {
+            return (
+              <Box paddingX={2}>
+              <VariantSelector
+                handleOptionChange={(event, option_name, index) => handleOptionChange(event, option_name, index)}
+                key={option.id.toString()}
+                option={option}
+                option_name={option.name}
+                index={index}
+                product={product}
+                variant={variant}
+              />
+              </Box>
+            );
+          });
+          } else {
+                variant_selectors = product.options.map((option, index) => {
+            return (
+              <SingleVariantSelector
+                handleOptionChange={(event, option_name, index) => handleOptionChange(event, option_name, index)}
+                key={option.id.toString()}
+                option={option}
+                option_name={option.name}
+                index={index}
+                product={product}
+                variant={variant}
+              />
+            );
+          });
+          }
+
+          const styles = {
+          modalBackground: {
           backgroundImage: `url(${variantImage})`,
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
-          height: 'calc(200px + 25vh)',
-          minWidth: '185px',
-          minHeight: '200px',
-          maxHeight: '400px'
-        },
-        titleAppearance: {
-          borderRadius: '0 5px 5px 0',
-          transform:'translateY(200px)',
-          marginRight: '5%',
-          padding: '1px 0px 1px 0px',
-          background: 'rgba(255,255,255,0.44)'
-        },
-        titleHide: {
-          display: 'none'
-        }
-      };
-
-
-    return (
-      <div>
-      {this.props.isSliding == false ?
-          <ModalLink
-          path={`/art/${product.vendor.replace(" ","-").toLowerCase().toString()}-${product.title.replace(" ","-").toLowerCase().toString()}`}
-          parentPath='/'
-          component={Product}
-          props={{
-          addVariantToCart: this.props.addVariantToCart,
-          checkout: this.props.checkout,
-          key: product.id.toString(),
-          product: product,
-          artSize: (Math.random() + 1),
-          productIDs: this.props.productIDs,
-          productIndex: this.props.productIndex,
-          handleImageLoaded: this.props.handleImageLoaded
-        }}>
-              <BackgroundImage style={styles.homeBackground} src={variantImage} placeholder={variantImage} key={this.props.product.name}>
-                <div style={this.props.cartOpen == true ? styles.titleHide : styles.titleAppearance}>
-                <h5 className="Product__title" style={{'paddingLeft':'16px', 'marginBottom': '0', 'zIndex':'4', 'color' : 'rgba(0,0,0,0.8)'}}>{this.props.product.title}</h5>
-                <h5 className="Product__vendor" style={{'paddingLeft':'16px', 'marginTop': '2px', 'zIndex': '4','color' : 'rgba(0,0,0,0.8)'}}>{this.props.product.vendor}</h5>
-                </div> }
-                <Box alignItems="center" display="flex" alignSelf="center" justifyContent="center" >
-                  <Box padding={1}>
-                  </Box>
-                </Box>
-              </BackgroundImage>
-          </ModalLink> : <BackgroundImage style={styles.homeBackground} src={variantImage} placeholder={variantImage} key={this.props.product.name}>
-                          <div className="Product_title__overlay" style={{'borderRadius': '0 5px 5px 0', 'transform':'translateY(200px)', 'marginRight': '5%', 'padding': '1px 0px 1px 0px', 'background': 'rgba(255,255,255,0.44)'}}>
-                          <h5 className="Product__title" style={{'paddingLeft':'16px', 'marginBottom': '0', 'zIndex':'4', 'color' : 'rgba(0,0,0,0.8)'}}>{this.props.product.title}</h5>
-                          <h5 className="Product__vendor" style={{'paddingLeft':'16px', 'marginTop': '2px', 'zIndex': '4','color' : 'rgba(0,0,0,0.8)'}}>{this.props.product.vendor}</h5>
-                          </div>
-                          <Box alignItems="center" display="flex" alignSelf="center" justifyContent="center" >
-                            <Box padding={1}>
-                            </Box>
-                          </Box>
-                        </BackgroundImage> }
-      </div>
-    );
-  }
-}
-
-class Product extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { order: null};
-
-   let defaultOptionValues = {};
-    this.props.product.options.forEach((selector) => {
-      defaultOptionValues[selector.name] = selector.values[0].value;
-    });
-    this.state = { cartDisabled: false, scrollElement: 0, isOpen: false, selectedVariantQuantity: 1, showConfirmationToast: 0, selectedOptions: defaultOptionValues, modalOpen: false, modalRunning: true};
-    this.handleModalClose = this.handleModalClose.bind(this);
-    this.handleModalCloseHash = this.handleModalCloseHash.bind(this);
-    this.handleOptionChange = this.handleOptionChange.bind(this);
-    this.handleQuantityChange = this.handleQuantityChange.bind(this);
-    this.findImage = this.findImage.bind(this);
-    this.goPreviousProduct = this.goPreviousProduct.bind(this);
-    this.goNextProduct = this.goNextProduct.bind(this);
-    this.scrollDiv = this.scrollDiv.bind(this);
-    this.componentDidMount = this.componentDidMount.bind(this);
-    this.componentWillMount = this.componentWillMount.bind(this);
-  }
-
-  componentWillMount() {
-    this.props.product.options.forEach((selector) => {
-      this.setState({
-        selectedOptions: { [selector.name]: selector.values[0] }
-      });
-    });
-  }
-
-  componentDidMount() {
-  //  let focusElement = document.getElementsByClassName('rodal-dialog')[0].firstChild;
- //   focusElement.focus();
-  }
-
-  findImage(images, variantId) {
-    const primary = images[0];
-
-    const image = images.filter(function (image) {
-      return image.variant_ids.includes(variantId);
-    })[0];
-
-    return (image || primary).src;
-  }
-
-  handleOptionChange(event, name) {
-    let selectedOptions = this.state.selectedOptions;
-    selectedOptions[name] = event;
-
-     if (event !== null && _.isUndefined(this.props.product.variants.edges.find((variant) => {
-      return variant.node.selectedOptions.every((selectedOption) => {
-        return selectedOptions[selectedOption.name] === selectedOption.value;
-      });
-    })) == false) {
-    const selectedVariant = this.props.product.variants.edges.find((variant) => {
-      return variant.node.selectedOptions.every((selectedOption) => {
-        return selectedOptions[selectedOption.name] === selectedOption.value;
-      });
-    }).node;
-      this.setState({cartDisabled: false});
-      this.setState({
-      selectedVariant: selectedVariant,
-      selectedVariantImage: selectedVariant.image.src
-    });
-      } else {
-        this.setState({cartDisabled: true});
-      }
-
-  }
-
-  handleQuantityChange(event) {
-    let value = event.value;
-    if (value < 1) {
-      value = 1;
-    }
-    this.setState({
-      selectedVariantQuantity: value
-      });
-  }
-
-
-  handleModalClose() {
-    this.props.history.push('/');
-    this.setState({modalOpen: false, modalRunning: false});
-  }
-
-  handleModalCloseHash() {
-    this.props.history.push('/cart');
-    this.setState({modalOpen: false, modalRunning: false});
-  }
-
-  goPreviousProduct() {
-    this.setState({modalRunning: true});
-    let currentIndex = this.props.productIndex;
-    if (currentIndex === 0) {
-      currentIndex = this.props.productIDs.length;
-    }
-    this.props.history.push('/art/' + this.props.productIDs[currentIndex - 1][1].replace(" ","-").toLowerCase().toString() + '-' + this.props.productIDs[currentIndex - 1][2].replace(" ","-").toLowerCase().toString());
-  }
-
-    goNextProduct() {
-    this.setState({modalRunning: true});
-    let currentIndex = this.props.productIndex;
-    if (currentIndex === this.props.productIDs.length - 1) {
-      currentIndex = -1;
-    }
-    this.props.history.push('/art/' + this.props.productIDs[currentIndex + 1][1].replace(" ","-").toLowerCase().toString() + '-' + this.props.productIDs[currentIndex + 1][2].replace(" ","-").toLowerCase().toString());
-  }
-
-  scrollDiv() {
-  //   console.log(document.activeElement);
-  //    document.getElementById('rodal-modal').firstChild.click();
-  }
-
-  render() {
-    let variantImage = this.state.selectedVariantImage || this.props.product.images.edges[0].node.src
-    let variant = this.state.selectedVariant || this.props.product.variants.edges[0].node
-    let variantQuantity = this.state.selectedVariantQuantity
-    let variant_selectors = [];
-    let text_button_variant_selectors = [];
-    if (this.props.product.variants.edges[0].node.selectedOptions.length > 1) {
-    variant_selectors = this.props.product.options.map((option) => {
-      return (
-        <Box paddingX={2}>
-        <VariantSelector
-          handleOptionChange={this.handleOptionChange}
-          key={option.id.toString()}
-          option={option}
-          product={this.props.product}
-          variant={variant}
-          selectedVariant={this.selectedVariant}
-        />
-        </Box>
-      );
-    });
-    } else {
-          variant_selectors = this.props.product.options.map((option) => {
-      return (
-        <SingleVariantSelector
-          handleOptionChange={this.handleOptionChange}
-          key={option.id.toString()}
-          option={option}
-          product={this.props.product}
-          variant={variant}
-          selectedVariant={this.selectedVariant}
-        />
-      );
-    });
-    }
-
-   const styles = {
-  modalBackground: {
-    backgroundImage: `url(${variantImage})`,
-    height: '100vh',
-    minHeight: '100%',
-    width: '100vw',
-    marginBottom: '0 !important',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: 'cover',
-    marginTop: '0 !important',
-    marginLeft:'auto',
-    marginRight: 'auto',
-    padding: '0',
-    zIndex: '5 !important',
-    overflowY: 'scroll',
-    overflowX: 'hidden',
-  },
-    desktopBackground: {
-    backgroundImage: `url(${variantImage})`,
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: 'cover',
-    padding: '0',
-    zIndex: '5 !important',
-    overflowY: 'scroll',
-    overflowX: 'hidden',
-    minHeight: '80vh',
-    maxWidth: '40vw',
-  },
-  homeBackground: {
-    backgroundImage: `url(${variantImage})`,
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: 'cover',
-    height: '100vh',
-    minWidth: '100vw',
-  },
-  modalContent: {
-    height: '90vh',
-    width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-  }
-};
-    let bioDescription = this.props.product.descriptionHtml.split("<h1><span>BIO</span></h1>");
-         return (
-      <div id="top-level-modal" style={{'height':'100vh', 'width': '100vw'}}>
-      <Box display="flex" direction="row" paddingY={2}>
-       <ReactModal
-  isOpen={this.state.modalRunning}
-  onRequestClose={() => this.handleModalClose()}
-  closeTimeoutMS={50}
-  style={{ overlay: {}, content: {          backgroundImage: `url(${variantImage})`,
-  backgroudnBlendMode: 'difference',
           height: '100vh',
-          minHeight: '100vh',
+          minHeight: '100%',
+          width: '100vw',
           marginBottom: '0 !important',
-          backgroundPosition: 'bottom center',
+          backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
           marginTop: '0 !important',
           marginLeft:'auto',
           marginRight: 'auto',
-          width: '100vw',
-          zIndex: '5 !important',} }}
-  contentLabel="Example Modal"
-  portalClassName="ReactModalPortal"
-  overlayClassName="ReactModal__Overlay"
-  className="ReactModal__Content"
-  bodyOpenClassName="ReactModal__Body--open"
-  htmlOpenClassName="ReactModal__Html--open"
-  ariaHideApp={true}
-  shouldFocusAfterRender={true}
-  shouldCloseOnOverlayClick={true}
-  shouldCloseOnEsc={true}
-  shouldReturnFocusAfterClose={true}
-  role={"dialog"}
-  aria={{
-    labelledby: "heading",
-    describedby: "full_description"
-  }}
-><div style={{'background': 'rgba(255,255,255,0.35)', 'padding': '25px', 'minHeight': '100vh' }}>
-  <div className="just-donate" style={{'position': 'fixed', 'right': '12px', 'top': '2px', 'zIndex': '9999'}}>
-    <Box padding={2}>
-    <IconButton
-      accessibilityLabel="Cancel"
-      bgColor="white"
-      icon="cancel"
-      iconColor="darkGray"
-      onClick={() => {this.handleModalClose()}}
-    />
-    </Box>
-  </div>
+          padding: '0',
+          zIndex: '5 !important',
+          overflowY: 'scroll',
+          overflowX: 'hidden',
+          },
+          desktopBackground: {
+          backgroundImage: `url(${variantImage})`,
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          padding: '0',
+          zIndex: '5 !important',
+          overflowY: 'scroll',
+          overflowX: 'hidden',
+          minHeight: '80vh',
+          maxWidth: '40vw',
+          },
+          homeBackground: {
+          backgroundImage: `url(${variantImage})`,
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          height: '100vh',
+          minWidth: '100vw',
+          },
+          modalContent: {
+          height: '90vh',
+          width: '100%',
+          backgroundColor: 'rgba(255, 255, 255, 0.6)',
+          }
+          };
+          let bioDescription = "";
 
-        <Swipeable
-                onSwipingRight={() => this.goPreviousProduct()}
-                onSwipingLeft={() => this.goNextProduct()} >
-              <Box display="flex" direction="row" paddingY={2}>
-                  <Column span={12}>
-                  <Box padding={2}>
-                  <ProductDescriptionImage variantImage={variantImage} bioDescription={bioDescription} product={this.props.product} variant={variant} />
-                    {this.props.product.images.edges.length ? <img src={variantImage} style={{'maxHeight': '450px', 'paddingTop': '50px'}} alt={`${this.props.product.title} product shot`}/> : null}
-                    <div className={'mobileOptions'}>
-                    <ProductOptions handleQuantityChange={this.handleQuantityChange} selectedVariantQuantity={this.state.selectedVariantQuantity} variant_selectors={variant_selectors} />
+          return (
+            <div id="top-level-modal" style={{'height':'100vh', 'width': '100vw'}}>
+            <Box display="flex" direction="row" paddingY={2}>
+            <ReactModal
+      isOpen={true}
+      onRequestClose={handleModalClose}
+      closeTimeoutMS={50}
+      style={{ overlay: {}, content: {          backgroundImage: `url(${variantImage})`,
+      backgroudnBlendMode: 'difference',
+              height: '100vh',
+              minHeight: '100vh',
+              marginBottom: '0 !important',
+              backgroundPosition: 'bottom center',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'cover',
+              marginTop: '0 !important',
+              marginLeft:'auto',
+              marginRight: 'auto',
+              width: '100vw',
+              zIndex: '5 !important',} }}
+      contentLabel="Example Modal"
+      portalClassName="ReactModalPortal"
+      overlayClassName="ReactModal__Overlay"
+      className="ReactModal__Content"
+      bodyOpenClassName="ReactModal__Body--open"
+      htmlOpenClassName="ReactModal__Html--open"
+      ariaHideApp={true}
+      shouldFocusAfterRender={true}
+      shouldCloseOnOverlayClick={true}
+      shouldCloseOnEsc={true}
+      shouldReturnFocusAfterClose={true}
+      role={"dialog"}
+      aria={{
+        labelledby: "heading",
+        describedby: "full_description"
+      }}>
+            <div style={{'background': 'rgba(255,255,255,0.35)', 'padding': '25px', 'minHeight': '100vh' }}>
+            <div className="just-donate" style={{'position': 'fixed', 'right': '12px', 'top': '9px', 'zIndex': '9999'}}>
+            <Box padding={2}>
+            <IconButton
+            accessibilityLabel="Cancel"
+            bgColor="white"
+            icon="cancel"
+            iconColor="darkGray"
+            onClick={handleModalClose}
+            />
+            </Box>
+            </div>
+              <Swipeable
+                      onSwipingRight={goPreviousProduct}
+                      onSwipingLeft={goNextProduct} >
+                    <Box display="flex" direction="row" paddingY={2}>
+                        <Column span={12}>
+                        <Box padding={2}>
+                        <ProductDescriptionImage variantImage={variantImage} bioDescription={bioDescription} product={product} variant={variant} />
+                          {product.images.edges.length ? <img src={variantImage} style={{'maxHeight': '450px', 'paddingTop': '50px'}} alt={`${product.title} product shot`}/> : null}
+                          <div className={'mobileOptions'}>
+                          <ProductOptions handleQuantityChange={handleQuantityChange} variant_selectors={variant_selectors} />
+                          <label className="Product__option">
+                            <div style={{'maxWidth': '100%'}}>
+                             <TextField
+                                id="quantity"
+                                min="1"
+                                onChange={(value) => handleQuantityChange(value)}
+                                placeholder="Quantity"
+                                value={data.selectedVariantQuantity}
+                                type={"number"}
+                              />
+                              </div>
+                          </label>
+                          <p className={'productPriceOptions'}><span style={{'color': 'black'}}> { variant.node.availableForSale == true ? '$' +  variant.node.price.toString() + ' / ea' :  variant.node.title.toString() + ' is Out of Stock'}</span></p>
+                          <ProductAdd addVariantToCart={(variantId, selectedVariantQuantity) => addVariantToCart(variantId, selectedVariantQuantity)} variant={variant} selectedVariantQuantity={variantQuantity} history={history} cartDisabled={data.cartDisabled}/>
+                          </div>
+                        </Box>
+                      </Column>
+                    </Box>
+                  </Swipeable>
+                  </div>
+                  <div className={'desktopOptions'} style={{'width': '33vw', 'height': '100vh', 'position': 'fixed', 'top': '76px', 'right': '0', 'display': 'block', 'background': 'rgba(0,0,0,0.45)', 'color': 'white'}}>
+                    <ProductOptions handleQuantityChange={handleQuantityChange} variant_selectors={variant_selectors} />
+                    <div style={{'display': 'inline'}}>
+                    <p className={'productPriceOptions'}><span style={{'color': '#222', 'fontFamily': 'LiberationSansRegular'}}> { variant.node.availableForSale == true ? '$' +  variant.node.price.toString() + ' / ea':  variant.node.title.toString() + ' is Out of Stock'}</span></p>
+                    </div>
+                    <div style={{'display': 'inline', 'width': '33vw'}}>
                     <label className="Product__option">
-                      <div style={{'maxWidth': '100%'}}>
+                      <div style={{'maxWidth': '22vw'}}>
                        <TextField
                           id="quantity"
                           min="1"
-                          onChange={(value) => this.handleQuantityChange(value)}
+                          onChange={(value) => handleQuantityChange(value)}
                           placeholder="Quantity"
-                          value={this.props.selectedVariantQuantity}
+                          value={variantQuantity}
                           type={"number"}
                         />
                         </div>
+                        <div style={{'width': '9vw', 'marginLeft': 'calc(23vw + 4px)', 'transform': 'translateY(-63px)'}}>
+                        <ProductAdd addVariantToCart={(variantId, selectedVariantQuantity) => addVariantToCart(variantId, selectedVariantQuantity)} variant={variant} selectedVariantQuantity={variantQuantity} history={history} cartDisabled={data.cartDisabled}/>
+                        </div>
                     </label>
-                    <p className={'productPriceOptions'}><span style={{'color': 'black'}}> {variant.availableForSale == true ? '$' + variant.price.toString() + ' / ea' : variant.title.toString() + ' is Out of Stock'}</span></p>
-                    <Button color="gray" disabled={ this.state.cartDisabled == true || variant.availableForSale === false ? true : false } text={ variant.availableForSale === true ? "Add to Cart" : "Out of Stock" } onClick={() => {this.props.addVariantToCart(variant.id, variantQuantity); this.handleModalCloseHash();}} style={{'marginBottom':'12px', 'position': 'fixed', 'right': '5px', 'bottom': '0', 'left': '5px'}} />
                     </div>
-                  </Box>
-                </Column>
+                  </div>
+                  <ProductSocial product={product} />
+                  </ReactModal>
               </Box>
-            </Swipeable>
             </div>
-            <div className={'desktopOptions'} style={{'width': '33vw', 'height': '100vh', 'position': 'fixed', 'top': '56px', 'right': '0', 'display': 'block', 'background': 'rgba(0,0,0,0.45)', 'color': 'white'}}>
-              <ProductOptions handleQuantityChange={this.handleQuantityChange} selectedVariantQuantity={this.state.selectedVariantQuantity} variant_selectors={variant_selectors} />
-              <div style={{'display': 'inline'}}>
-              <p className={'productPriceOptions'}><span style={{'color': '#222', 'fontFamily': 'LiberationSansRegular'}}> {variant.availableForSale == true ? '$' + variant.price.toString() + ' / ea': variant.title.toString() + ' is Out of Stock'}</span></p>
-              </div>
-              <div style={{'display': 'inline', 'width': '33vw'}}>
-              <label className="Product__option">
-                <div style={{'maxWidth': '22vw'}}>
-                 <TextField
-                    id="quantity"
-                    min="1"
-                    onChange={(value) => this.handleQuantityChange(value)}
-                    placeholder="Quantity"
-                    value={this.props.selectedVariantQuantity}
-                    type={"number"}
-                  />
-                  </div>
-                  <div style={{'width': '9vw', 'marginLeft': 'calc(23vw + 4px)', 'transform': 'translateY(-63px)'}}>
-                  <Button color="gray" disabled={ this.state.cartDisabled == true || variant.availableForSale === false ? true : false } text={ variant.availableForSale === true ? "Add to Cart" : "Out of Stock" } onClick={() => {this.props.addVariantToCart(variant.id, variantQuantity); this.handleModalCloseHash();}} style={{'marginBottom':'12px', 'position': 'fixed !important', 'right': '5px', 'bottom': '0', 'left': '5px'}} />
-                  </div>
-              </label>
-              </div>
-            </div>
-            <ProductSocial location={this.props.location} product={this.props.product} />
-            </ReactModal>
-        </Box>
-      </div>
+          );
+        }
+        }}
+      </Query>
     );
+
+
+const query = gql`
+query($id: ID!) {
+  node(id: $id) {
+    id
+    ... on Product {
+      title
+      vendor
+      handle
+      productType
+      descriptionHtml
+      createdAt
+      options {
+        id
+        name
+        values
+      }
+      variants(first: 250) {
+        edges {
+          node {
+            id
+            title
+            selectedOptions {
+              name
+              value
+            }
+            image {
+              src
+            }
+            availableForSale
+            price
+          }
+        }
+      }
+      images(first:250) {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+        }
+        edges {
+          node {
+            src
+          }
+        }
+      }
+    }
+  }
+  selectedVariant @client
+  selectedVariantQuantity @client
+  cartDisabled @client
+  initialVariantBool @client
+}
+`;
+
+const variantQuery = gql`
+query($variantId: ID!) {
+  node(id: $variantId) {
+    id
+    ... on ProductVariant {
+      title
+      selectedOptions {
+        name
+        value
+      }
+      image {
+        src
+      }
+      availableForSale
+      price
+    }
   }
 }
+`;
 
-export default ModalLinkProduct;
+const ProductFragment = gql`
+fragment ProductFragment on Product {
+    variants(first: 250) {
+      edges {
+        node(selectedOptions: $selectedOptions) {
+          id
+          title
+          image {
+            src
+          }
+          availableForSale
+          price
+        }
+      }
+    }
+  }`;
+const ProductRouter = withRouter(Product);
 
-/**
-f
-gestalt css editting
-
-<Box
-   fit
-   dangerouslySetInlineStyle={{
-     __style: {
-       bottom: 50,
-       left: '50%',
-       transform: 'translateX(-50%)',
-       zIndex: 10
-     },
-   }}
-   paddingX={1}
-   position='fixed'
- >
-</Box>
-
-**/
+export default ProductRouter;

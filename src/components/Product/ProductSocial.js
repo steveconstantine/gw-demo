@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ShareButton from 'react-social-share-buttons';
 import { Box } from 'gestalt';
+import { withRouter } from 'react-router-dom';
 
 class ProductSocial extends Component {
     render() {
@@ -11,7 +12,7 @@ class ProductSocial extends Component {
                <ShareButton
                   compact
                   socialMedia={'facebook'}
-                  url={'https://floating-woodland-46616.herokuapp.com' + this.props.location.pathname}
+                  url={'https://localhost:3000' + this.props.location.pathname}
                   media={this.props.variantImage}
                   text={this.props.product.vendor + ' / ' + this.props.product.title}
               />
@@ -43,4 +44,7 @@ class ProductSocial extends Component {
     );
   }
 }
-export default ProductSocial;
+
+const ProductSocialRouter = withRouter(ProductSocial);
+
+export default ProductSocialRouter;

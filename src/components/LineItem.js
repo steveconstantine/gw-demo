@@ -27,6 +27,7 @@ class LineItem extends Component {
   }
 
   render() {
+    console.log('lineItem');
     let bgImg = this.props.line_item.variant.image.src || this.props.line_item.image.src;
     return (
       <li className="Line-item">

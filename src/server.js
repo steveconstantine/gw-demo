@@ -12,10 +12,12 @@ import { AppRegistry } from 'react-native';
 import { render } from '@jaredpalmer/after';
 import routes from './routes';
 import Document from './Document';
+import initApollo from './apollo';
 
 if (!process.browser) {
   global.fetch = fetch
 }
+
 
 var compression = require('compression');
 var minify = require('express-minify');
@@ -34,26 +36,25 @@ server
   .get('/*', async (req, res) => {
     const customRenderer = node => {
 
-      const cache = new InMemoryCache();
 
-      const ssrMode = !process.browser;
-      const httpLink = createHttpLink({ uri: 'https://giftingwildinc.myshopify.com/api/graphql', fetch: fetch })
+      const initialState = { cartDisabled: false,
+                             checkoutCreated: false,
+                             checkoutId: null,
+                             donationId: '',
+                             donationVariantId : '',
+                             isProductModalOpen : false,
+                             isCartModalOpen: true,
+                             isNetworkOffline : false,
+                             lineItems: [],
+                             selectedOptions: [],
+                             selectedVariant: [],
+                             initialVariantBool: true,
+                             selectedVariantImage: '',
+                             selectedVariantQuantity: 1,
+                             whichProductOpen: ''
+                            };
 
-      const token = localStorage.get('token');
-
-      const middlewareLink = setContext(() => ({
-        headers: {
-          'X-Shopify-Storefront-Access-Token': 'e533f252f3a673c02f85798859530319'
-        },
-        authorization: token ? `Bearer ${token}` : "",
-      }))
-
-
-      const client = new ApolloClient({
-        ssrMode,
-        link: middlewareLink.concat(httpLink),
-        cache: cache
-      });
+      const client = initApollo(initialState);
 
       class App extends React.Component {
 
@@ -62,8 +63,15 @@ server
           this.state = { loaded: false, client: null };
         }
 
-        async componentDidMount() {
+        componentDidMount() {
 
+        /*  this.props.createCheckout({
+            variables: {
+              input: {}
+            }}).then((res) => {
+            let resSave =  res.data.checkoutCreate.checkout;
+            client.writeData({ data: { checkout: resSave } });
+          });*/
           this.setState({
             loaded: true,
             client
@@ -72,7 +80,7 @@ server
 
         render() {
           if (!this.state.loaded) {
-           return <div></div>;
+           return <div id={'spinner'} style={{'background': 'url(/skye-whalesong8x32.jpg)'}}></div>;
          } else {
            return <ApolloProvider client={client}>{node}</ApolloProvider>;
          }
@@ -83,7 +91,7 @@ server
         AppRegistry.registerComponent('App', () => App);
         const { element, getStyleElement } = AppRegistry.getApplication('App');
         const css = getStyleElement();
-        const initialApolloState = client.extract();
+        const initialApolloState = client.cache.extract();
         const html = renderToString(element);
         return { html, initialApolloState, css };
       });
@@ -100,7 +108,6 @@ server
         // Anything else you add here will be made available
         // within getInitialProps(ctx)
         // e.g a redux store...
-        customThing: 'thing',
       });
       res.send(html);
     } catch (error) {
@@ -111,7 +118,7 @@ server
   });
 
   server.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Origin", "https://giftingwildinc.myshopify.com/api/graphql");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
   });
