@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
-import CartContainer from './containers/cartcontainer';
 import gql from 'graphql-tag';
 import {
   createCheckout,
