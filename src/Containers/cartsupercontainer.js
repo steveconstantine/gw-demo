@@ -22,8 +22,6 @@ import {
 import { withApollo } from "react-apollo";
 import _ from 'underscore';
 
-var localStorage = require('web-storage')().localStorage;
-
 class CartSuperContainer extends React.Component {
 
   constructor() {
@@ -39,32 +37,6 @@ class CartSuperContainer extends React.Component {
     this.updateLineItemInCart = updateLineItemInCart.bind(this);
     this.handleDonations = this.handleDonations.bind(this);
     this.associateCustomerCheckout = associateCustomerCheckout.bind(this);
-  }
-
-  componentWillMount() {
-    let checkoutIdCart = this.props.client.readQuery({
-    query: gql`{
-      checkoutId @client
-      checkoutCreated @client
-    }`})
-    if (checkoutIdCart.checkoutId == null) {
-      console.log('createCheckout');
-      this.props.createCheckout({
-        variables: {
-          input: {}
-        }}).then((res) => {
-        let resSave = res.data.checkoutCreate.checkout;
-        console.log(res.data.checkoutCreate.checkout);
-        this.props.client.writeData({ data: { checkoutId: res.data.checkoutCreate.checkout.id } })
-        this.setState({checkoutIdQuery: res.data.checkoutCreate.checkout.id});
-        this.setState({checkoutCreatedQuery: true });
-      }, this);
-    } else {
-      this.setState({checkoutCreatedQuery: true });
-      }
-  }
-
-  componentDidMount() {
   }
 
 

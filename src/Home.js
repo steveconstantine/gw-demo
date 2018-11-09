@@ -42,8 +42,6 @@ import './styles/slick-theme.css';
 import './styles/app.css';
 import './styles/Scrollable.css';
 
-var localStorage = require('web-storage')().localStorage;
-
 class Home extends Component {
 
    responsive = {
@@ -65,7 +63,7 @@ class Home extends Component {
       isCustomerAuthOpen: false,
       activeIndex: 0,
       isNewCustomer: false,
-      loggedIn: localStorage.get('token') ? true : false,
+      loggedIn: false,
       products: [],
       suggestions: [],
       value: '',
@@ -323,7 +321,7 @@ class Home extends Component {
                     <Button color="red" text="Ask us anything" />
                   </Box>
                   <Box paddingX={2} marginTop={3}>
-                    <Button color="blue" text="Log out" onClick={() => {localStorage.removeItem('token'); this.setState({loggedIn: false})}}/>
+                    <Button color="blue" text="Log out" onClick={() => {this.setState({loggedIn: false})}}/>
                   </Box>
                 </Box>
               </Flyout>}

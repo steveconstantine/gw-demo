@@ -116,15 +116,6 @@ class Product extends Component {
   }
 
   componentWillMount() {
-    localStorage.remove('checkout');
-    this.props.createCheckout({
-      variables: {
-        input: {}
-      }}).then((res) => {
-      let resSave = localStorage.get('checkout') || res.data.checkoutCreate.checkout;
-      this.setState({
-        checkout: resSave
-      });
     });
 
     this.props.product.options.forEach((selector) => {

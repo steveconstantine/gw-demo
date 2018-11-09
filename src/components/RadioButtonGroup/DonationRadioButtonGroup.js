@@ -24,8 +24,8 @@ class DonationRadioButtonGroup extends React.Component {
         const {value} = this.props;
         const className = value == item.value ? this.getSelectedClassName() : '';
         return (
-            <a key={item.value+item.label} href="#" className={className}
-               onClick={this.onClick(item.value).bind(this)}>{item.label}</a>
+            <button key={item.value+item.label} className={className}
+               onClick={this.onClick(item.value).bind(this)}>{item.label}</button>
         );
     };
 

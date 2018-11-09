@@ -26,24 +26,27 @@ import { withRouter } from "react-router-dom";
 
 ReactModal.setAppElement('#root');
 
-const Product = ({ history, url, match, cartDisabled, addVariantToCart }) => (
+const Product = ({ history, url, match, initVariant, variantId, cartDisabled, addVariantToCart }) => (
       <Query query={ query } variables={{ id: match.params.id }}>
         {({ loading, error, data, client }) => {
-
-
           if (loading) {
+            console.log('loading products.js')
             return (<div id={'spinner'} style={{'background': 'url(/skye-whalesong8x32.jpg)'}}></div>);
           }
 
           if (error) {
+            console.log('error');
             return <p>{error.message}</p>;
           }
 
           // console.log(data.node);
 
           if (data) {
-          const product = data.node;
-          const initialVariant = data.node.variants.edges[0];
+          console.log('products.js data');
+          console.log(data);
+
+          const productInfo = data.node;
+          const products = data.node.variants;
 
           const findImage = (images, variantId) => {
             const primary = images[0];
@@ -58,53 +61,40 @@ const Product = ({ history, url, match, cartDisabled, addVariantToCart }) => (
           const handleOptionChange = (event, option_name, index) => {
 
             let selectedNew = {};
-            let variantCheck = data.initialVariantBool;
-            console.log('check for length');
-            console.log(data.selectedVariant);
-            console.log(data.selectedVariant.length);
-            if (data.selectedVariant.length === product.options.length && product.options.length > 0) {
-                variantCheck = false;
-                console.log('variantCheckout false? ' + variantCheck);
-            }
-
-            if (variantCheck == true) {
-              selectedNew = initialVariant;
-            } else {
-              selectedNew = data.selectedVariant;
-            }
-
 
             // write query to set all 3 defaults or 2 defaults or default and then select from there.
 
             selectedNew[option_name] = event;
 
-             if (event !== null && _.isUndefined(product.variants.edges.find((variant) => {
+            console.log('reaches here');
+            console.log(data);
+
+             if (event !== null && _.isUndefined(products.edges.find((variant) => {
               return  variant.node.selectedOptions.every((selectedOption) => {
-                return selectedNew.node.selectedOptions[selectedOption.name] === selectedOption.value;
+                return selectedNew[selectedOption.name] === selectedOption.value;
               });
             })) == false) {
 
-            const selectedVariantLoop = product.variants.edges.find((variant) => {
+            var selectedVariantLoop = [];
+            selectedVariantLoop.push(products.edges.find((variant) => {
               return  variant.node.selectedOptions.every((selectedOption) => {
-                return selectedNew.node.selectedOptions[selectedOption.name] === selectedOption.value;
+                return selectedNew[selectedOption.name] === selectedOption.value;
               });
-            });
-
+            }));
+            console.log('selectedVariantLoop vvv');
             console.log(selectedVariantLoop);
-            console.log('selectedVariantLoop ^^^');
             console.log('ProductVariant:' + selectedVariantLoop.node.id);
-            let selectedOptions = selectedVariantLoop.node.selectedOptions;
-           let query = client.readQuery({query: variantQuery, variables: { selectedOptions: selectedOptions } })
-            if (variantCheck == false) {
-              client.writeData({ data: { cartDisabled: false, selectedVariant: selectedVariantLoop }})
-            } else {
-              client.writeData({ data: { cartDisabled: false, selectedVariant: initialVariant }})
-            }
-          } else {
-              client.writeData({ data: { cartDisabled: false } })
-          }
 
-          };
+        //    let query = client.readQuery({query: variantQuery, variables: { variantId: products.variants.edges[0].node.id } })
+            console.log('query');
+
+            let finalVariant = client.readQuery({variantQuery, variables: { id: selectedVariantLoop.node.id}});
+
+            client.writeData({ data: { cartDisabled: false, selectedVariant: finalVariant.node}})
+        } else {
+          console.log('jumped loop');
+        }
+      };
 
           const handleQuantityChange = (event) => {
             let value = event.value;
@@ -147,23 +137,22 @@ const Product = ({ history, url, match, cartDisabled, addVariantToCart }) => (
 
           let variant;
 
-          if (data.initialVariantBool == true) {
-            variant = data.node.variants.edges[0];
-          } else {
-            variant = data.selectedVariant;
-          }
+          if (data.selectedVariant != null)
+          variant = data.selectedVariant;
+          if (data.selectedVariant == null)
+          variant = initVariant;
 
           console.log('** variant **');
           console.log(variant);
           let variantImage = variant.node.image.src;
 
-          console.log('variant var');
-          console.log(variant);
+          console.log('variant data var');
+          console.log(data.selectedVariant);
           let variantQuantity = data.selectedVariantQuantity || 1;
           let variant_selectors = [];
           let text_button_variant_selectors = [];
-          if (product.variants.edges[0].node.selectedOptions.length > 1) {
-          variant_selectors = product.options.map((option, index) => {
+          if (data.node.options.length > 0) {
+          variant_selectors = data.node.options.map((option, index) => {
             return (
               <Box paddingX={2}>
               <VariantSelector
@@ -172,14 +161,14 @@ const Product = ({ history, url, match, cartDisabled, addVariantToCart }) => (
                 option={option}
                 option_name={option.name}
                 index={index}
-                product={product}
+                product={productInfo}
                 variant={variant}
               />
               </Box>
             );
           });
           } else {
-                variant_selectors = product.options.map((option, index) => {
+                variant_selectors = data.node.options.map((option, index) => {
             return (
               <SingleVariantSelector
                 handleOptionChange={(event, option_name, index) => handleOptionChange(event, option_name, index)}
@@ -187,7 +176,7 @@ const Product = ({ history, url, match, cartDisabled, addVariantToCart }) => (
                 option={option}
                 option_name={option.name}
                 index={index}
-                product={product}
+                product={productInfo}
                 variant={variant}
               />
             );
@@ -294,8 +283,8 @@ const Product = ({ history, url, match, cartDisabled, addVariantToCart }) => (
                     <Box display="flex" direction="row" paddingY={2}>
                         <Column span={12}>
                         <Box padding={2}>
-                        <ProductDescriptionImage variantImage={variantImage} bioDescription={bioDescription} product={product} variant={variant} />
-                          {product.images.edges.length ? <img src={variantImage} style={{'maxHeight': '450px', 'paddingTop': '50px'}} alt={`${product.title} product shot`}/> : null}
+                        <ProductDescriptionImage variantImage={variantImage} bioDescription={bioDescription} product={productInfo} variant={variant} />
+                          {variant.node.image.src ? <img src={variantImage} style={{'maxHeight': '450px', 'paddingTop': '50px'}} alt={`${variant.node.title} product shot`}/> : null}
                           <div className={'mobileOptions'}>
                           <ProductOptions handleQuantityChange={handleQuantityChange} variant_selectors={variant_selectors} />
                           <label className="Product__option">
@@ -341,7 +330,7 @@ const Product = ({ history, url, match, cartDisabled, addVariantToCart }) => (
                     </label>
                     </div>
                   </div>
-                  <ProductSocial product={product} />
+                  <ProductSocial variant={variant} />
                   </ReactModal>
               </Box>
             </div>
@@ -385,19 +374,9 @@ query($id: ID!) {
           }
         }
       }
-      images(first:250) {
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-        }
-        edges {
-          node {
-            src
-          }
-        }
-      }
     }
   }
+  variants @client
   selectedVariant @client
   selectedVariantQuantity @client
   cartDisabled @client
@@ -406,24 +385,107 @@ query($id: ID!) {
 `;
 
 const variantQuery = gql`
-query($variantId: ID!) {
-  node(id: $variantId) {
+  query($id: ID!) {
+    node(id: $id) {
+      id
+      ... on ProductVariant {
+        title
+        selectedOptions {
+          name
+          value
+        }
+        image {
+          src
+        }
+        availableForSale
+        price
+      }
+    }
+  selectedVariant @client {
+    available
     id
-    ... on ProductVariant {
+    image {
+      src
+    }
+    price
+    product {
       title
-      selectedOptions {
+      vendor
+      handle
+      productType
+      descriptionHtml
+      createdAt
+      options {
+        id
         name
-        value
+        values
       }
-      image {
-        src
+      variants(first: 250) {
+        edges {
+          node {
+            id
+            title
+            selectedOptions {
+              name
+              value
+            }
+            image {
+              src
+            }
+            availableForSale
+            price
+          }
+        }
       }
-      availableForSale
-      price
+    }
+    selectedOptions {
+      name
+      value
+    }
+    title
+    weight
+  }
+  selectedVariantQuantity @client
+  variants @client {
+    edges {
+      node {
+        id
+        title
+        selectedOptions {
+          name
+          value
+        }
+        image {
+          src
+        }
+        availableForSale
+        price
+      }
     }
   }
+  cartDisabled @client
+  initialVariantBool @client
 }
 `;
+
+
+const superVariantQuery = gql`
+query($id: ID!, $selectedOptions: [SelectedOption!]) {
+    ... on ProductVariantEdge {
+      node(id: $id, selectedOptions: $selectedOptions) {
+        title
+        selectedOptions {
+          name
+          value
+        }
+        image {
+          src
+        }
+        availableForSale
+        price
+      }
+    }
+  }`;
 
 const ProductFragment = gql`
 fragment ProductFragment on Product {
@@ -441,6 +503,9 @@ fragment ProductFragment on Product {
       }
     }
   }`;
+
 const ProductRouter = withRouter(Product);
 
-export default ProductRouter;
+const ProductApollo = withApollo(ProductRouter);
+
+export default ProductApollo;

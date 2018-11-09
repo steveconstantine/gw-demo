@@ -18,7 +18,7 @@ class ProductAdd extends Component {
   }
 
   startAddVariant() {
-    this.props.addVariantToCart(this.props.variant.node.id, this.props.selectedVariantQuantity);
+    this.props.addVariantToCart(this.props.variant.id, this.props.data.selectedVariantQuantity);
   }
 
   render() {
@@ -32,9 +32,8 @@ class ProductAdd extends Component {
     }
 
 
-    const { variant, selectedVariantQuantity, history, client, data, cartDisabled } = this.props;
-    console.log('variant.id');
-    console.log(variant.node.id);
+    const { variant, history, client, data, cartDisabled } = this.props;
+
     return (
           <Button color="gray" disabled={ variant.availableForSale === false ? true : false } text={ variant.availableForSale === true ? "Add to Cart" : "Out of Stock" } onClick={() => {this.startAddVariant(); this.handleModalCloseHash(history, client)}} style={{'marginBottom':'12px', 'position': 'fixed', 'right': '5px', 'bottom': '0', 'left': '5px'}} />
     );
@@ -44,6 +43,7 @@ class ProductAdd extends Component {
 const query = gql`
   query cartSuperContainerQuery {
   lineItems @client
+  selectedVariantQuantity @client
 }
 `;
 

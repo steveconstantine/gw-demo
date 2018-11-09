@@ -1,7 +1,6 @@
 import gql from 'graphql-tag';
 import _ from 'underscore';
 
-var localStorage = require('web-storage')().localStorage;
 
 const CheckoutFragment = gql`
   fragment CheckoutFragment on Checkout {

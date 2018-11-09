@@ -23,8 +23,8 @@ class RadioButtonGroup extends React.Component {
         const { value, option_index, option_name } = this.props;
         const className = value == item.value ? this.getSelectedClassName() : '';
         return (
-            <a key={item.value+item.label} href="#" className={className}
-               onClick={() => this.props.onClick(item.value, option_name, option_index)}>{item.label}</a>
+            <button key={item.value+item.label} className={className}
+               onClick={() => this.props.onClick(item.value, option_name, option_index)}>{item.label}</button>
         );
     };
 

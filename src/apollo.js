@@ -1,5 +1,5 @@
 import * as fetch from 'cross-fetch'
-import { InMemoryCache } from 'apollo-cache-inmemory';
+import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory';
 import { setContext, getContext } from 'apollo-link-context';
 import { persistCache } from 'apollo-cache-persist';
 import { withClientState } from 'apollo-link-state';
@@ -9,14 +9,14 @@ import { onError } from "apollo-link-error";
 import { ApolloLink, Observable } from 'apollo-link'; // <-- Add Observable
 import { compose } from 'react-apollo';
 import gql from 'graphql-tag';
-
-var localStorage = require('web-storage')().localStorage;
+import introspectionQueryResultData from './shopifyFragmentTypes.json';
 
 if (!process.browser) {
-  global.fetch = fetch
+  global.fetch = fetch;
 }
 
-const token = localStorage.get('token');
+var uuid = require("uuid");
+var token = uuid.v4();
 
 const typeDefs = `
   type LineItem {
@@ -38,18 +38,9 @@ const typeDefs = `
     Money: Scalar
   }
 
-  type ID {
-    ID: Scalar
-  }
-
-  type SelectedOption {
-    name: String
-    value: String
-  }
-
   type Image {
     altText: String
-    id: [ID]
+    id: ID
     src: [URL]
   }
 
@@ -65,7 +56,7 @@ const typeDefs = `
 
   type ProductVariant {
     available: Boolean
-    id: [ID]
+    id: ID
     image: [Image]
     price: [Money]
     product: [Product]
@@ -92,7 +83,7 @@ const typeDefs = `
     descriptionHtml: String
     descriptionPlainSummary: String
     handle: String
-    id: [ID]
+    id: ID
     images: [ImageConnection]
     options: [ProductOption]
     productType: String
@@ -119,7 +110,7 @@ const typeDefs = `
     descriptionHtml: [HTML]
     descriptionPlainSummary: String
     handle: String
-    id: [ID]
+    id: ID
     image: [Image]
     products: [ProductConnection]
     title: String
@@ -178,7 +169,7 @@ const typeDefs = `
   type AppliedGiftCard {
     amountUsed: [Money]
     balance": [Money]
-    id: [ID]
+    id: ID
     lastCharacters: String
   }
 
@@ -210,10 +201,12 @@ const typeDefs = `
     isProductModalOpen : Boolean
     lineItems: [CheckoutLineItemEdge]
     selectedOptions: [selectedOption]
-    selectedVariant: [ProductVariantConnection]
+    selectedVariant: [ProductVariant]
+    selectedVariant2: [ProductVariant]
     initialVariantBool: Boolean
     selectedVariantImage: [Image]
     selectedVariantQuantity: Int
+    variants: [ProductVariantConnection]
     whichProductOpen: String
   }
 `;
@@ -265,7 +258,12 @@ const requestLink = new ApolloLink((operation, forward) =>
   })
 );
 
-const cache = new InMemoryCache().restore(initialState || window.__APOLLO_STATE__);
+let cache;
+
+  const fragmentMatcher = new IntrospectionFragmentMatcher({
+    introspectionQueryResultData
+  });
+ cache = new InMemoryCache({ fragmentMatcher }).restore(initialState || window.__APOLLO_STATE__);
 
 const client = new ApolloClient({
   cache,

@@ -10,18 +10,20 @@ import { CachePersistor } from 'apollo-cache-persist';
 import * as fetch from 'isomorphic-fetch';
 import { AppRegistry } from 'react-native';
 import { render } from '@jaredpalmer/after';
+import { graphql } from 'react-apollo';
 import routes from './routes';
 import Document from './Document';
 import initApollo from './apollo';
+import {
+  createCheckout
+} from './checkout';
 
 if (!process.browser) {
   global.fetch = fetch
 }
 
-
 var compression = require('compression');
 var minify = require('express-minify');
-var localStorage = require('web-storage')().localStorage;
 
 const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
 
@@ -36,7 +38,6 @@ server
   .get('/*', async (req, res) => {
     const customRenderer = node => {
 
-
       const initialState = { cartDisabled: false,
                              checkoutCreated: false,
                              checkoutId: null,
@@ -48,44 +49,103 @@ server
                              lineItems: [],
                              selectedOptions: [],
                              selectedVariant: [],
+                             selectedVariant2: [],
                              initialVariantBool: true,
                              selectedVariantImage: '',
                              selectedVariantQuantity: 1,
+                             variants: [],
                              whichProductOpen: ''
                             };
 
       const client = initApollo(initialState);
 
-      class App extends React.Component {
+
+      class MyApp extends React.Component {
 
         constructor(){
           super();
           this.state = { loaded: false, client: null };
         }
 
-        componentDidMount() {
+       async componentDidMount() {
+        let { client } = this.state;
 
-        /*  this.props.createCheckout({
+        let checkoutIdCart = client.readQuery({
+        query: gql`{
+          checkoutId @client
+          checkoutCreated @client
+        }`})
+        if (checkoutIdCart.checkoutId == null) {
+
+          const res = await
+          client.mutate({
+            mutation: createCheckout,
             variables: {
               input: {}
-            }}).then((res) => {
-            let resSave =  res.data.checkoutCreate.checkout;
-            client.writeData({ data: { checkout: resSave } });
-          });*/
-          this.setState({
-            loaded: true,
-            client
+            }
           });
+
+          console.log('res');
+          console.log(res);
+          client.writeData({ data: { checkoutId: res.data.checkoutCreate.checkout.id } });
         }
+      }
+
 
         render() {
           if (!this.state.loaded) {
            return <div id={'spinner'} style={{'background': 'url(/skye-whalesong8x32.jpg)'}}></div>;
          } else {
+           const { client } = this.state;
+
            return <ApolloProvider client={client}>{node}</ApolloProvider>;
          }
        }
      }
+
+     const CheckoutFragment = gql`
+       fragment CheckoutFragment on Checkout {
+         id
+         webUrl
+         totalTax
+         subtotalPrice
+         totalPrice
+         lineItems (first: 250) {
+           edges {
+             node {
+               id
+               title
+               variant {
+                 id
+                 title
+                 image {
+                   src
+                 }
+                 price
+               }
+               quantity
+             }
+           }
+         }
+       }
+     `;
+
+     const createCheckout = gql`
+       mutation checkoutCreate ($input: CheckoutCreateInput!){
+         checkoutCreate(input: $input) {
+           userErrors {
+             message
+             field
+           }
+           checkout {
+             ...CheckoutFragment
+           }
+         }
+       }
+       ${CheckoutFragment}
+     `;
+
+     const App = MyApp;
 
       return getDataFromTree(App).then(async data => {
         AppRegistry.registerComponent('App', () => App);

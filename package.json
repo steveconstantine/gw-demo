@@ -6,10 +6,10 @@
     "dev": "razzle start",
     "start:windows": "cross-env NODE_ENV=production razzle build && cross-env NODE_ENV=production node build/server.js",
     "start": "NODE_ENV=production node /app/build/server.js",
-    "build": "razzle build",
+    "build": "node ./generateShopifyFragments.js && razzle build",
     "test": "razzle test --env=jsdom",
     "start:prod": "NODE_ENV=production node /app/build/server.js",
-    "heroku-postbuild": "razzle build"
+    "heroku-postbuild": "node ./generateShopifyFragments.js && razzle build"
   },
   "dependencies": {
     "@jaredpalmer/after": "latest",
@@ -72,6 +72,7 @@
     "uglifyjs-3-webpack-plugin": "^1.2.4",
     "uglifyjs-webpack-plugin": "^1.2.7",
     "underscore": "^1.9.1",
+    "uuid": "^3.3.2",
     "web-storage": "^1.0.0"
   }
 }

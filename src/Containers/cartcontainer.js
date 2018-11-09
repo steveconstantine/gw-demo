@@ -23,8 +23,6 @@ import {
   associateCustomerCheckout
 } from '../checkout';
 
-var localStorage = require('web-storage')().localStorage;
-
 const CartContainerApollo = ({ checkoutId, lineItems, isCartModalOpen, urlLocation, removeDonationInCart, removeLineItemInCart, updateLineItemInCart, handleDonations, donationId }) => (
     <Query query={ query } variables={{ id: checkoutId }}>
       {({ loading, error, data, client }) => {

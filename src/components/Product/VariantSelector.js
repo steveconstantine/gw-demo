@@ -27,7 +27,7 @@ class VariantSelector extends Component {
           )
     });
     this.setState({variantValues: vV});
-    this.props.handleOptionChange(vV[0], this.props.option.name, this.props.index);
+  //  this.props.handleOptionChange(vV[0], this.props.option.name, this.props.index);
   }
 
   render() {

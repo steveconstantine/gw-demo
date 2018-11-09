@@ -22,12 +22,6 @@ import { withApollo } from "react-apollo";
 import _ from 'underscore';
 
 
-let CHECKOUT_ID;
-
-var localStorage = require('web-storage')().localStorage;
-
-var params_for_query = {};
-
 class ProductContainer extends React.Component {
 
   constructor() {
@@ -44,13 +38,10 @@ class ProductContainer extends React.Component {
   }
 
   componentWillMount() {
-    let theProduct = this.props.client.readQuery({ query: query, variables: { id: this.props.match.params.id } });
-    this.props.client.writeData({ data: { initialVariant: theProduct.variants.edges[0] } });
-    let checkoutIdCart = this.props.client.readQuery({
-    query: checkoutQuery});
-      console.log(checkoutIdCart.selectedOptions);
-      console.log(theProduct);
-
+    console.log('firstItem');
+    console.log(this.props.firstItem);
+    this.props.client.writeData({ data: { selectedVariant: this.props.firstItem.variants.edges[0].node, variants: this.props.firstItem.variants } });
+    console.log(this.props.client.readQuery({ query: checkoutQuery }));
   //    let theProduct = this.props.client.readQuery({
   //    query: query, variables: { id: this.props.match.params.id } });
   //      console.log(theProduct);
@@ -58,121 +49,61 @@ class ProductContainer extends React.Component {
       query: gql`query($id: ID!, $selectedOptions: selectedOption) {
         ...ProductFragment
       }${ProductFragment}`, variables: { id: this.props.match.params.id, selectedOptions: theProduct.node.variants.edges.node } });*/
-    if (checkoutIdCart.checkoutId == null) {
-      console.log('createCheckout');
-      this.props.createCheckout({
-        variables: {
-          input: {}
-        }}).then((res) => {
-        let resSave = res.data.checkoutCreate.checkout;
-        console.log(res.data.checkoutCreate.checkout);
-        this.props.client.writeData({ data: { checkoutId: res.data.checkoutCreate.checkout.id } })
-        this.setState({checkoutIdQuery: res.data.checkoutCreate.checkout.id});
-        this.setState({checkoutCreatedQuery: true });
-      }, this);
-    } else {
-      this.setState({checkoutCreatedQuery: true });
-      }
+
+  //  let theProduct2 = this.props.client.readQuery({ query: query2, variables: { id: this.props.match.params.id, variantId: theProduct.edges[0].node.id }})
   }
 
   componentDidMount() {
-
   }
 
   addThisVariantToCart(variantId, selectedVariantQuantity) {
     this.addVariantToCart(variantId, selectedVariantQuantity);
   }
 
-    render() {
+  render() {
+    if (this.props.data.loading) {
+      return (<div id={'spinner'} style={{'background': 'url(/skye-whalesong8x32.jpg)'}}></div>);
+    }
 
-      if (this.props.data.loading) {
-        return (<div id={'spinner'} style={{'background': 'url(/skye-whalesong8x32.jpg)'}}></div>);
-      }
-      if (this.props.data.error) {
-        return <p>{this.props.data.error.message}</p>;
-      }
+    if (this.props.data.error) {
+      return <p>{this.props.data.error.message}</p>;
+    }
 
-      const { data, history, match } = this.props;
-      const { url } = this.props.location;
 
-      console.log('data.checkout product container');
-      console.log(data);
+    const { data, history, match } = this.props;
+    const { url } = this.props.location;
+
+    if (data) {
 
       return (
           <div className="appcontainer">
               <ProductRouter
-              history={ history }
-              match={ match }
-              location={ url }
+              history={ this.props.history }
+              match={ this.props.match }
+              url={ url }
+              variantId={this.props.firstItem.id}
+              selectedOptions={this.props.firstItem.selectedOptions}
               cartDisabled={data.cartDisabled}
               addVariantToCart={(variantId, selectedVariantQuantity) => this.addThisVariantToCart(variantId, selectedVariantQuantity)}
               />
           </div>
       );
     }
+  }
 }
 
-const query = gql`query($id: ID!) {
-  node(id: $id) {
-    id
-    ... on Product {
-      title
-      vendor
-      handle
-      productType
-      descriptionHtml
-      createdAt
-      options {
-        id
-        name
-        values
-      }
-      variants(first: 1) {
-        edges {
-          node {
-            id
-            title
-            selectedOptions {
-              name
-              value
-            }
-            image {
-              src
-            }
-            availableForSale
-            price
-          }
-        }
-      }
-    }
-  }
-}`;
-
-
 const checkoutQuery = gql`query {
+    cartDisabled @client
     checkoutCreated @client
     checkoutId @client
     selectedOptions @client
     lineItems @client
-  }`
+    selectedVariant @client
+  }`;
 
 function addVariantToCart(variantId, quantity) {
 
   var checkout = this.props.client.readQuery({ query: checkoutQuery });
-
-  if (checkout.checkoutId == null) {
-    console.log('createCheckout');
-    this.props.createCheckout({
-      variables: {
-        input: {}
-      }}).then((res) => {
-      let resSave = res.data.checkoutCreate.checkout;
-      console.log(res.data.checkoutCreate.checkout);
-      this.props.client.writeData({ data: { checkoutId: res.data.checkoutCreate.checkout.id } })
-      this.setState({checkoutIdQuery: res.data.checkoutCreate.checkout.id});
-      this.setState({checkoutCreatedQuery: true });
-    }, this);
-  }
     console.log(checkout);
     this.props.checkoutLineItemsAdd(
       { variables: { checkoutId: checkout.checkoutId, lineItems:  [{variantId, quantity: parseInt(quantity, 10)}] }
@@ -195,6 +126,7 @@ function addVariantToCart(variantId, quantity) {
   }
 
 const ProductContainerWithDataAndMutation = compose(
+  graphql(checkoutQuery),
   graphql(createCheckout, {name: "createCheckout"}),
   graphql(checkoutLineItemsAdd, {name: "checkoutLineItemsAdd"}),
   graphql(checkoutLineItemsUpdate, {name: "checkoutLineItemsUpdate"}),
@@ -203,9 +135,6 @@ const ProductContainerWithDataAndMutation = compose(
   graphql(checkoutCustomerAssociate, {name: "checkoutCustomerAssociate"})
 )(ProductContainer);
 
-const ProductContainerRouter = withRouter(ProductContainerWithDataAndMutation)
-
-
-const ProductContainerApollo = withApollo(ProductContainerRouter)
+const ProductContainerApollo = withRouter(ProductContainerWithDataAndMutation)
 
 export default ProductContainerApollo;
