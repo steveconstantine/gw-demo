@@ -13,6 +13,7 @@ import { render } from '@jaredpalmer/after';
 import { graphql } from 'react-apollo';
 import routes from './routes';
 import Document from './Document';
+import gql from 'graphql-tag';
 import initApollo from './apollo';
 import {
   createCheckout
