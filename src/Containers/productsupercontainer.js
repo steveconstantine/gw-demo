@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 //import ProductSocial from './Product/ProductSocial';
 //import ProductOptions from './Product/ProductOptions';
 //import ProductDescriptionImage from './Product/ProductDescriptionImage';
-import ProductContainerApollo from './ProductContainer';
+import ProductContainerApollo from './productcontainer';
 import { graphql, compose, withApollo } from 'react-apollo';
 import { Query } from "react-apollo";
 

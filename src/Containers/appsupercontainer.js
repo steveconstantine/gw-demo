@@ -1,5 +1,5 @@
 import React from 'react';
-import AppContainer from './AppContainer';
+import AppContainer from './appcontainer';
 import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import { withRouter } from "react-router-dom";

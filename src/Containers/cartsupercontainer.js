@@ -1,5 +1,5 @@
 import React from 'react';
-import CartContainerApollo from './CartContainer';
+import CartContainerApollo from './cartcontainer';
 import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import { withRouter } from "react-router-dom";

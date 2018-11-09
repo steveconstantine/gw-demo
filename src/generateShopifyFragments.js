@@ -34,7 +34,7 @@ var token = uuid.v4();
             type => type.possibleTypes !== null,
           );
           result.data.__schema.types = filteredData;
-          fs.writeFile('./src/shopifyFragmentTypes.json', JSON.stringify(result.data), err => {
+          fs.writeFile('./shopifyFragmentTypes.json', JSON.stringify(result.data), err => {
             if (err) {
               console.error('Error writing fragmentTypes file', err);
             } else {

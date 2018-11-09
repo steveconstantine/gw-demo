@@ -6,10 +6,10 @@
     "dev": "razzle start",
     "start:windows": "cross-env NODE_ENV=production razzle build && cross-env NODE_ENV=production node build/server.js",
     "start": "NODE_ENV=production node /app/build/server.js",
-    "build": "node ./generateShopifyFragments.js && razzle build",
+    "build": "node ./src/generateShopifyFragments.js && razzle build",
     "test": "razzle test --env=jsdom",
     "start:prod": "NODE_ENV=production node /app/build/server.js",
-    "heroku-postbuild": "node ./generateShopifyFragments.js && razzle build"
+    "heroku-postbuild": "node ./src/generateShopifyFragments.js && razzle build"
   },
   "dependencies": {
     "@jaredpalmer/after": "latest",
