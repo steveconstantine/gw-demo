@@ -27,8 +27,8 @@ const ProductSuperContainer = ({ match, history, location }) => (
           }
 
           if (data) {
-            console.log(data.node);
-            return (<ProductContainerApollo match={match} client={client} location={location} history={history} firstItem={data.node}/>)
+            console.log(data)
+            return (<ProductContainerApollo match={match} client={client} location={location} history={history} firstItem={data}/>)
           }
         }}
       </Query>
@@ -88,10 +88,7 @@ const checkoutQuery = gql`query {
     cartDisabled @client
     checkoutCreated @client
     checkoutId @client
-    selectedOptions @client
-    lineItems @client
-    selectedVariant @client
-  }`;
+}`;
 
 const ProductFragment = gql`
 fragment ProductFragment on Product {

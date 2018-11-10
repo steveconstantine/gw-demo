@@ -27,18 +27,12 @@ class CartSuperContainer extends React.Component {
   constructor() {
     super();
 
-    this.state = {
-      checkoutIdQuery: "",
-      checkoutCreatedQuery: false,
-    };
-
     this.addVariantToCart = addVariantToCart.bind(this);
     this.removeLineItemInCart = removeLineItemInCart.bind(this);
     this.updateLineItemInCart = updateLineItemInCart.bind(this);
     this.handleDonations = this.handleDonations.bind(this);
     this.associateCustomerCheckout = associateCustomerCheckout.bind(this);
   }
-
 
   handleDonations(donationVariantId, value, lineItemId) {
     console.log('lineitems');
@@ -101,17 +95,9 @@ const query = gql`
 
 const CartSuperContainerWithDataAndMutation = compose(
   graphql(query),
-  graphql(createCheckout, {name: "createCheckout"}),
   graphql(checkoutLineItemsAdd, {name: "checkoutLineItemsAdd"}),
   graphql(checkoutLineItemsUpdate, {name: "checkoutLineItemsUpdate"}),
-  graphql(checkoutLineItemsRemove, {name: "checkoutLineItemsRemove"}),
-  graphql(checkoutCustomerAssociate, {name: "associateCustomerCheckout"}),
-  graphql(checkoutCustomerAssociate, {name: "checkoutCustomerAssociate"})
+  graphql(checkoutLineItemsRemove, {name: "checkoutLineItemsRemove"})
 )(CartSuperContainer);
 
-const CartSuperContainerwithRouter = withRouter(CartSuperContainerWithDataAndMutation);
-
-const CartSuperContainerApollo = withApollo(CartSuperContainerWithDataAndMutation)
-
-
-export default CartSuperContainerApollo;
+export default CartSuperContainerWithDataAndMutation;

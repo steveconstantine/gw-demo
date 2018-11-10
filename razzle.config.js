@@ -15,7 +15,7 @@ module.exports = {
 
   if (target === 'web') {
   }
-/*
+
   appConfig.optimization = {
         minimize: true,
         minimizer: [
@@ -60,7 +60,6 @@ module.exports = {
         ],
       };
 
-*/
     //don't load gql/graphql with file-loader
     appConfig.module.rules
       .find(conf => conf.loader && conf.loader.includes('file-loader'))

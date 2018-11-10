@@ -17,7 +17,7 @@ class MyApp extends React.Component {
 
   constructor() {
     super();
-    this.state = { client: null, loaded: false, checkoutId: null};
+    this.state = { client: null, loaded: false};
   }
 
   componentWillMount() {
@@ -28,6 +28,7 @@ class MyApp extends React.Component {
         const initialState = { cartDisabled: false,
                                checkoutCreated: false,
                                checkoutId: null,
+                               currentProduct: [],
                                donationId: '',
                                donationVariantId : '',
                                isProductModalOpen : false,
@@ -36,11 +37,10 @@ class MyApp extends React.Component {
                                lineItems: [],
                                selectedOptions: [],
                                selectedVariant: [],
-                               selectedVariant2: [],
+                               selectedVariant2: '',
                                initialVariantBool: true,
                                selectedVariantImage: '',
                                selectedVariantQuantity: 1,
-                               variants: [],
                                whichProductOpen: ''
                               };
 
@@ -73,13 +73,12 @@ class MyApp extends React.Component {
       console.log('res');
       console.log(res);
 
-      client.writeData({ data: { checkoutId: res.data.checkoutCreate.checkout.id } });
+      try {
+        client.writeData({ data: { checkoutId: res.data.checkoutCreate.checkout.id } });
+      } catch(e) {
+        console.log(e); // 30
+      }
 
-      this.setState({checkoutId: res.data.checkoutCreate.checkout.id });
-      this.setState({checkoutCreatedQuery: true });
-
-    } else {
-      this.setState({checkoutCreatedQuery: true });
     }
   }
 

@@ -23,7 +23,7 @@ import {
   associateCustomerCheckout
 } from '../checkout';
 
-const CartContainerApollo = ({ checkoutId, lineItems, isCartModalOpen, urlLocation, removeDonationInCart, removeLineItemInCart, updateLineItemInCart, handleDonations, donationId }) => (
+const CartContainerApollo = ({ removeDonationInCart, removeLineItemInCart, updateLineItemInCart, handleDonations, checkoutId }) => (
     <Query query={ query } variables={{ id: checkoutId }}>
       {({ loading, error, data, client }) => {
 
@@ -42,15 +42,15 @@ const CartContainerApollo = ({ checkoutId, lineItems, isCartModalOpen, urlLocati
 
       if (data) {
       return(<Cart  data={data}
-                    isCartModalOpen={isCartModalOpen}
-                    checkoutId={checkoutId}
+                    isCartModalOpen={data.isCartModalOpen}
+                    checkoutId={data.checkoutId}
                     lineItems={data.node.lineItems}
                     setDonationValue={(value, lineItemId) => { handleDonations(value, lineItemId) }}
                     removeDonationInCart={(lineItemId) => { removeDonationInCart(lineItemId)}}
                     removeLineItemInCart={removeLineItemInCart}
                     updateLineItemInCart={updateLineItemInCart}
                     isCartOpen={true}
-                    donationId={donationId}
+                    donationId={null}
                     />);
 
       }}}

@@ -20,7 +20,7 @@ var token = uuid.v4();
 
 const typeDefs = `
   type LineItem {
-    id: ID
+    id: [ID]
     quantity: Int
     title: String
     variant: [ProductVariant]
@@ -38,9 +38,13 @@ const typeDefs = `
     Money: Scalar
   }
 
+  type ID {
+    id: ID
+  }
+
   type Image {
     altText: String
-    id: ID
+    id: [ID]
     src: [URL]
   }
 
@@ -55,15 +59,12 @@ const typeDefs = `
   }
 
   type ProductVariant {
-    available: Boolean
-    id: ID
+    availableForSale: Boolean
+    id: [ID]
     image: [Image]
     price: [Money]
-    product: [Product]
     selectedOptions: [SelectedOption]
     title: String
-    weight: Float
-    weightUnit: [WeightUnit]
   }
 
   type ProductConnection {
@@ -83,7 +84,7 @@ const typeDefs = `
     descriptionHtml: String
     descriptionPlainSummary: String
     handle: String
-    id: ID
+    id: [ID]
     images: [ImageConnection]
     options: [ProductOption]
     productType: String
@@ -110,7 +111,7 @@ const typeDefs = `
     descriptionHtml: [HTML]
     descriptionPlainSummary: String
     handle: String
-    id: ID
+    id: [ID]
     image: [Image]
     products: [ProductConnection]
     title: String
@@ -129,7 +130,7 @@ const typeDefs = `
 
   type CheckoutLineItem {
     customAttributes: [Attribute]
-    id: ID
+    id: [ID]
     quantity: Int
     title: String
     variant: [ProductVariant]
@@ -153,14 +154,9 @@ const typeDefs = `
       node: [CheckoutLineItem]
   }
 
-  type CheckoutLineItemEdge {
-      cursor: String,
-      node: [CheckoutLineItem]
-  }
-
   type CheckoutLineItem {
     customAttributes: [Attribute]
-    id: ID
+    id: [ID]
     quantity: Int
     title: String
     variant: [ProductVariant]
@@ -169,7 +165,7 @@ const typeDefs = `
   type AppliedGiftCard {
     amountUsed: [Money]
     balance": [Money]
-    id: ID
+    id: [ID]
     lastCharacters: String
   }
 
@@ -196,17 +192,18 @@ const typeDefs = `
   type Query {
     cartDisabled: Boolean
     checkoutCreated: String
+    checkoutId: String
+    currentProduct: [Product]
     donationVariantId : String
     isCartModalOpen: Boolean
     isProductModalOpen : Boolean
     lineItems: [CheckoutLineItemEdge]
     selectedOptions: [selectedOption]
-    selectedVariant: [ProductVariant]
-    selectedVariant2: [ProductVariant]
+    selectedVariant: [ProductVariantEdge]
+    selectedVariant2: String
     initialVariantBool: Boolean
     selectedVariantImage: [Image]
     selectedVariantQuantity: Int
-    variants: [ProductVariantConnection]
     whichProductOpen: String
   }
 `;
@@ -224,13 +221,11 @@ let apolloClient;
 export function create(initialState) {
 
   const ssrMode = !process.browser;
-  const token = localStorage.get('token');
 
   const oldHeaders = { 'X-Shopify-Storefront-Access-Token': 'e533f252f3a673c02f85798859530319' };
 
 
   const request = async (operation) => {
-    const token = await localStorage.getItem('token');
     operation.setContext({
       headers: {
         authorization: token
@@ -274,7 +269,6 @@ const client = new ApolloClient({
       }
       if (networkError && networkError.statusCode === 401) {
           // remove cached token on 401 from the server
-          localStorage.remove('token');
       }
     }),
     withClientState({
@@ -335,8 +329,7 @@ const client = new ApolloClient({
           }
         },
       },
-      cache,
-      typeDefs
+      cache
     }),
     contextLink,
     new HttpLink({
@@ -350,10 +343,6 @@ return client;
 
 }
 
-export function refreshToken() {
-  // refresh token here
-  return localStorage.get('token');
-}
 
 export default function initApollo(initialState) {
   // Make sure to create a new client for every server-side request so that data

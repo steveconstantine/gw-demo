@@ -42,6 +42,7 @@ server
       const initialState = { cartDisabled: false,
                              checkoutCreated: false,
                              checkoutId: null,
+                             currentProduct: [],
                              donationId: '',
                              donationVariantId : '',
                              isProductModalOpen : false,
@@ -50,11 +51,10 @@ server
                              lineItems: [],
                              selectedOptions: [],
                              selectedVariant: [],
-                             selectedVariant2: [],
+                             selectedVariant2: '',
                              initialVariantBool: true,
                              selectedVariantImage: '',
                              selectedVariantQuantity: 1,
-                             variants: [],
                              whichProductOpen: ''
                             };
 

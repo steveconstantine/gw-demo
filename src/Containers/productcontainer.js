@@ -26,12 +26,6 @@ class ProductContainer extends React.Component {
 
   constructor() {
     super();
-
-    this.state = {
-      checkoutId: null,
-      checkout: { lineItems: { edges: [] } }
-    };
-
     this.addVariantToCart = addVariantToCart.bind(this);
     this.addThisVariantToCart = this.addThisVariantToCart.bind(this);
     this.associateCustomerCheckout = associateCustomerCheckout.bind(this);
@@ -40,20 +34,11 @@ class ProductContainer extends React.Component {
   componentWillMount() {
     console.log('firstItem');
     console.log(this.props.firstItem);
-    this.props.client.writeData({ data: { selectedVariant: this.props.firstItem.variants.edges[0].node, variants: this.props.firstItem.variants } });
-    console.log(this.props.client.readQuery({ query: checkoutQuery }));
-  //    let theProduct = this.props.client.readQuery({
-  //    query: query, variables: { id: this.props.match.params.id } });
-  //      console.log(theProduct);
-    /*  let selectedOptions = this.props.client.readQuery({
-      query: gql`query($id: ID!, $selectedOptions: selectedOption) {
-        ...ProductFragment
-      }${ProductFragment}`, variables: { id: this.props.match.params.id, selectedOptions: theProduct.node.variants.edges.node } });*/
-
-  //  let theProduct2 = this.props.client.readQuery({ query: query2, variables: { id: this.props.match.params.id, variantId: theProduct.edges[0].node.id }})
-  }
-
-  componentDidMount() {
+  //  this.props.client.writeData({ data: { variants: this.props.firstItem.node.variants } });
+    this.props.client.writeData({ data: { currentProduct: this.props.firstItem.node } });
+    this.props.client.writeData({ data: { selectedVariant: this.props.firstItem.node.variants.edges[0].node } });
+    this.props.client.writeData({ data: { selectedVariantQuantity: 1 } });
+    this.props.client.writeData({ data: { selectedOptions: this.props.firstItem.node.variants.edges[0].node.selectedOptions }});
   }
 
   addThisVariantToCart(variantId, selectedVariantQuantity) {
@@ -70,20 +55,19 @@ class ProductContainer extends React.Component {
     }
 
 
-    const { data, history, match } = this.props;
+    const { data, history, match, client } = this.props;
     const { url } = this.props.location;
 
     if (data) {
-
+      console.log('product container');
+      console.log(data.currentProduct);
       return (
           <div className="appcontainer">
               <ProductRouter
               history={ this.props.history }
               match={ this.props.match }
               url={ url }
-              variantId={this.props.firstItem.id}
-              selectedOptions={this.props.firstItem.selectedOptions}
-              cartDisabled={data.cartDisabled}
+              client={client}
               addVariantToCart={(variantId, selectedVariantQuantity) => this.addThisVariantToCart(variantId, selectedVariantQuantity)}
               />
           </div>
@@ -92,13 +76,57 @@ class ProductContainer extends React.Component {
   }
 }
 
-const checkoutQuery = gql`query {
+const checkoutQuery = gql` {
     cartDisabled @client
     checkoutCreated @client
     checkoutId @client
-    selectedOptions @client
-    lineItems @client
-    selectedVariant @client
+    selectedVariant @client {
+      availableForSale
+      id
+      image {
+        src
+      }
+      price
+      selectedOptions {
+        name
+        value
+      }
+      title
+    }
+    selectedOptions @client {
+      name
+      value
+    }
+    currentProduct @client {
+      title
+      vendor
+      handle
+      productType
+      descriptionHtml
+      createdAt
+      options {
+        id
+        name
+        values
+      }
+      variants(first: 250) {
+        edges {
+          node {
+            id
+            title
+            selectedOptions {
+              name
+              value
+            }
+            image {
+              src
+            }
+            availableForSale
+            price
+          }
+        }
+      }
+    }
   }`;
 
 function addVariantToCart(variantId, quantity) {
@@ -127,7 +155,6 @@ function addVariantToCart(variantId, quantity) {
 
 const ProductContainerWithDataAndMutation = compose(
   graphql(checkoutQuery),
-  graphql(createCheckout, {name: "createCheckout"}),
   graphql(checkoutLineItemsAdd, {name: "checkoutLineItemsAdd"}),
   graphql(checkoutLineItemsUpdate, {name: "checkoutLineItemsUpdate"}),
   graphql(checkoutLineItemsRemove, {name: "checkoutLineItemsRemove"}),

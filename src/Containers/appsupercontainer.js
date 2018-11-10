@@ -28,7 +28,6 @@ class AppSuperContainer extends React.Component {
     super();
     this.updateCartOpen = this.updateCartOpen.bind(this);
     this.handleDonations = this.handleDonations.bind(this);
-    this.state = { checkout: null, checkoutIdQuery: null, checkoutCreatedQuery: null, checkoutDataQuery: null};
   }
 
   handleDonations(donationVariantId, value, lineItemId) {
